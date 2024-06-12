@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiguliuxing.dts.db.dao.DtsReserveMapper">
+    
+    <select id="getByDate" parameterType="String" resultType="com.qiguliuxing.dts.db.domain.DtsReserve">
+        select * from dts_reserve
+        <where>
+            1=1
+            <if test="scene != null and scene != ''">
+                and scene = #{scene,jdbcType=INTEGER}
+            </if>
+            <choose>
+                <when test="startTime == null or endTime == null">
+                    and DATE_FORMAT(start_time, '%Y-%m-%d') = #{date,jdbcType=VARCHAR}
+                </when>
+                <otherwise>
+                    and (start_time &gt; #{startTime,jdbcType=TIMESTAMP} and start_time &lt; #{endTime,jdbcType=TIMESTAMP})
+                    or  (end_time &gt; #{startTime,jdbcType=TIMESTAMP} and end_time &lt; #{endTime,jdbcType=TIMESTAMP})
+                </otherwise>
+            </choose>
+        </where>
+    </select>
+</mapper>
