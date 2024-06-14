@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.qiguliuxing.dts.admin.service.SystemManageService;
 import com.qiguliuxing.dts.admin.util.AuthSupport;
 import com.qiguliuxing.dts.admin.util.Result;
+import com.qiguliuxing.dts.admin.util.WechatUtil;
 import com.qiguliuxing.dts.core.storage.StorageService;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.db.domain.DtsAd;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -93,9 +95,14 @@ public class SystemManageController {
     /**
      * 活动推送
      * */
-    @GetMapping("list")
-    public Result<String> push(@RequestParam(required = false) String name){
-        return new Result<>();
+    @GetMapping(value = "sendMsg")
+    public String sendMsg(HttpServletRequest request){
+        return null;
+    }
+    private static Map<String, Object> createDataItem(String name, String value) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("value", value);
+        return item;
     }
 
 }
