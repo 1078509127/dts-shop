@@ -112,7 +112,7 @@ public class ReserveController {
         LocalTime openTime = LocalTime.of(14, 0);//开放时间
         LocalTime closeTime = LocalTime.of(18, 0);//关闭时间
 
-        //查询当日是否有预约，无预约直接返回，有预约判断是否月满、预约时间段和库中数据是否有时间重叠
+        //查询当日是否有预约，无预约直接返回，有预约判断是否约满、预约时间段和库中数据是否有时间重叠
         List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null);
         if (byDay.isEmpty()){
             return Result.success("可预约");
@@ -123,7 +123,7 @@ public class ReserveController {
             UseTimeSolt useTimeSolt = new UseTimeSolt(startLocalTime,endLocalTime);
             useList.add(useTimeSolt);
         });
-        Collections.sort(useList, new UseTimeSoltComparator());
+        Collections.sort(useList, new UseTimeSoltComparator());//这里必须排序，否则freeTime无效
         List<FreeTimeSolt> freeTimeSolts = freeTime.freeTime(useList, openTime,closeTime);
         System.out.println(freeTimeSolts);
         if (freeTimeSolts.isEmpty()){
@@ -139,7 +139,7 @@ public class ReserveController {
                 return Result.fail(500,"只有"+str.substring(0, str.length() - 1)+"时间段可预约");
             }
         }
-        return new Result<>();
+        return Result.success("可预约");
     }
 
     static class UseTimeSoltComparator implements Comparator<UseTimeSolt> {
