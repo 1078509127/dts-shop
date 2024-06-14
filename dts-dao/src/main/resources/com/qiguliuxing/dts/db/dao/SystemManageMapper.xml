@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qiguliuxing.dts.db.dao.SystemManageMapper">
+
+    <select id="list" parameterType="String" resultType="com.qiguliuxing.dts.db.domain.DtsReserve">
+        select * from dts_reserve
+        <where>
+            1=1
+            <if test="name != null and name != ''">
+                and user_name LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%') or member_card LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%')
+            </if>
+                and DATE_FORMAT(start_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+        </where>
+    </select>
+</mapper>
