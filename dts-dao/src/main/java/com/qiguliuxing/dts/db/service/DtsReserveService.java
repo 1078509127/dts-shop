@@ -48,4 +48,12 @@ public class DtsReserveService {
    public List<DtsReserve> getByDate(String scene,String date,Date startTime,Date endTime) {
       return dtsReserveMapper.getByDate(scene,date,startTime,endTime);
    }
+
+   public List<DtsReserve> getByStartAndEnd(String scene,Date startTime,Date endTime) {
+      LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.eq(DtsReserve::getScene, scene);
+      queryWrapper.gt(DtsReserve::getEndTime, startTime);
+      queryWrapper.lt(DtsReserve::getStartTime, endTime);
+      return dtsReserveMapper.selectList(queryWrapper);
+   }
 }

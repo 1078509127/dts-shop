@@ -107,8 +107,7 @@ public class SystemManageController {
      * 活动推送
      * */
     @GetMapping("/sendMsg")
-    public String sendMsg(@RequestParam(required = true)String message){
-        System.out.println(message);
+    public String sendMsg(@RequestParam String theme,@RequestParam String time,@RequestParam String provider,@RequestParam String site,@RequestParam String organ,@RequestParam(required = false) String content){
         String accessToken = wechatUtil.getAccessToken();
         List<DtsUser> all = dtsUserService.all();
         all.stream().forEach(user ->{
@@ -117,11 +116,11 @@ public class SystemManageController {
             body.put("template_id","FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
             body.put("page","pages/appointment/line_up");
             Map<String,Object> map = new HashMap<>();
-            map.put("thing2","活动主题");
-            map.put("time4","2024-10-11 ~ 2024-10-12");
-            map.put("thing1","dtsadmin");
-            map.put("thing3","大连");
-            map.put("thing7","管委会");
+            map.put("thing2",theme);
+            map.put("time4",time);
+            map.put("thing1",provider);
+            map.put("thing3",site);
+            map.put("thing7",organ);
             body.put("data",map);
             String result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken, body, String.class);
             System.out.println(result);

@@ -4,6 +4,7 @@ import com.qiguliuxing.dts.db.domain.DtsCategory;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
 import com.qiguliuxing.dts.db.service.DtsCategoryService;
 import com.qiguliuxing.dts.db.service.DtsReserveService;
+import com.qiguliuxing.dts.db.util.DateUtils;
 import com.qiguliuxing.dts.wx.dao.DtsReserveVo;
 import com.qiguliuxing.dts.wx.dao.FreeTimeSolt;
 import com.qiguliuxing.dts.wx.dao.UseTimeSolt;
@@ -111,7 +112,7 @@ public class ReserveController {
         //查询选择日是否约满，约满直接返回fail
         FreeTime freeTime = new FreeTime();
         List<UseTimeSolt> useList = new ArrayList<>();
-        LocalTime openTime = LocalTime.of(14, 0);//开放时间
+        LocalTime openTime = LocalTime.of(9, 0);//开放时间
         LocalTime closeTime = LocalTime.of(18, 0);//关闭时间
 
         //查询当日是否有预约，无预约直接返回，有预约判断是否约满、预约时间段和库中数据是否有时间重叠
@@ -127,7 +128,6 @@ public class ReserveController {
         });
         Collections.sort(useList, new UseTimeSoltComparator());//这里必须排序，否则freeTime无效
         List<FreeTimeSolt> freeTimeSolts = freeTime.freeTime(useList, openTime,closeTime);
-        System.out.println(freeTimeSolts);
         if (freeTimeSolts.isEmpty()){
             return Result.fail(500,"当日无可预约时间段");
         }
@@ -156,15 +156,27 @@ public class ReserveController {
         if (!Objects.isNull(checkStartTime) && !Objects.isNull(checkEndTime)){
             for (UseTimeSolt timeSlot : timeSlots) {
                 // 检查时间段是否有重叠
-                if ((checkStartTime.isAfter(timeSlot.getUseStartTime()) || checkStartTime.equals(timeSlot.getUseStartTime()))
-                        && (checkStartTime.isBefore(timeSlot.getUseEndTime()) || checkStartTime.equals(timeSlot.getUseEndTime()))
-                        || (checkEndTime.isAfter(timeSlot.getUseStartTime()) || checkEndTime.equals(timeSlot.getUseStartTime()))
-                        && (checkEndTime.isBefore(timeSlot.getUseEndTime()) || checkEndTime.equals(timeSlot.getUseEndTime()))) {
+                if (checkStartTime.isBefore(timeSlot.getUseEndTime()) && checkEndTime.isAfter(timeSlot.getUseStartTime())) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * 查询具体时间段被使用的乒乓球桌号
+     * */
+    @GetMapping("/getTableList")
+    public Result<List<String>> getTableList(@RequestParam String scene,@RequestParam String date,@RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime){
+        Date startDate = DateUtils.parseDate(date+ " " + startTime);
+        Date endDate = DateUtils.parseDate(date+ " " + endTime);
+        List<DtsReserve> byStartAndEnd = dtsReserveService.getByStartAndEnd(scene, startDate, endDate);
+        List<String> list = new ArrayList<>();
+        byStartAndEnd.stream().forEach(dtsReserve ->{
+            list.add(dtsReserve.getTableNumber());
+        });
+        return Result.success(list);
     }
 
     /**
@@ -175,4 +187,5 @@ public class ReserveController {
         List<DtsCategory> dtsCategories = dtsCategoryService.queryChannel();
         return dtsCategories;
     }
+
 }
