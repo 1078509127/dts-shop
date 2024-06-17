@@ -188,4 +188,21 @@ public class AdminArticleController {
 		}
 		return null;
 	}
+
+	@GetMapping("/update")
+	public Object updateart(@RequestBody DtsArticle article) {
+		logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 推广管理->公告管理->详情,请求参数,id:{}", article.getId());
+		boolean isupdate = false;
+		try {
+			isupdate = articleService.updateByIdContent(article);
+		} catch (Exception e) {
+			logger.error("修改文章公告失败,文章id：{}", article);
+			e.printStackTrace();
+		}
+		// 这里不打印响应结果，文章内容信息较多
+		// logger.info("【请求结束】获取公告文章,响应结果：{}",JSONObject.toJSONString(article));
+		return ResponseUtil.ok(isupdate);
+	}
+
+
 }

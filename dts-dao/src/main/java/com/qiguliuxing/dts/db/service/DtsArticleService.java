@@ -71,4 +71,12 @@ public class DtsArticleService {
 	public void deleteById(Integer id) {
 		articleMapper.logicalDeleteByPrimaryKey(id);
 	}
+
+	//修改公告
+	public boolean updateByIdContent(DtsArticle article) {
+
+		article.setContent(article.getContent());
+		article.setId(article.getId());
+		return articleMapper.updateByIdSelective(article);
+	}
 }

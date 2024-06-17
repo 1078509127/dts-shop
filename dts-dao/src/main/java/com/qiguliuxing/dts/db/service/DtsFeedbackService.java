@@ -1,5 +1,6 @@
 package com.qiguliuxing.dts.db.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.qiguliuxing.dts.db.dao.DtsFeedbackMapper;
 import com.qiguliuxing.dts.db.domain.DtsFeedback;
@@ -46,5 +47,13 @@ public class DtsFeedbackService {
 
 		PageHelper.startPage(page, limit);
 		return feedbackMapper.selectByExample(example);
+	}
+    // 查看所有留言
+	public List<DtsFeedback> all(){
+		LambdaQueryWrapper<DtsFeedback> queryWrapper = new LambdaQueryWrapper<>();
+
+		//return systemManageMapper.selectList(queryWrapper);
+		return feedbackMapper.selectList();
+
 	}
 }

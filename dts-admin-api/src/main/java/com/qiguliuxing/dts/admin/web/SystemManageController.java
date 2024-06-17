@@ -9,12 +9,10 @@ import com.qiguliuxing.dts.admin.util.Result;
 import com.qiguliuxing.dts.admin.util.WechatUtil;
 import com.qiguliuxing.dts.core.storage.StorageService;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
-import com.qiguliuxing.dts.db.domain.DtsAd;
-import com.qiguliuxing.dts.db.domain.DtsCategory;
-import com.qiguliuxing.dts.db.domain.DtsReserve;
-import com.qiguliuxing.dts.db.domain.DtsUser;
+import com.qiguliuxing.dts.db.domain.*;
 import com.qiguliuxing.dts.db.service.DtsAdService;
 import com.qiguliuxing.dts.db.service.DtsCategoryService;
+import com.qiguliuxing.dts.db.service.DtsFeedbackService;
 import com.qiguliuxing.dts.db.service.DtsUserService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +51,9 @@ public class SystemManageController {
     private WechatUtil wechatUtil;
     @Autowired
     private DtsCategoryService dtsCategoryService;
+    @Autowired
+    private DtsFeedbackService feedbackService;
+
     /**
      * 轮播图上传
      * */
@@ -147,5 +148,31 @@ public class SystemManageController {
             return new Result<>(200,"关闭成功");
         }
         return Result.fail("关闭失败");
+    }
+    // 留言查询
+    @GetMapping("/getMessage")
+    public Object getMessage(Integer userId, String username,String type, @RequestParam(defaultValue = "1") Integer page,
+                             @RequestParam(defaultValue = "10") Integer limit,
+                             @Sort @RequestParam(defaultValue = "add_time") String sort,
+                             @Order @RequestParam(defaultValue = "desc") String order) {
+        logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 用户管理->意见反馈->查询,请求参数:userId:{},username:{},page:{}", userId, username, page);
+        //List<DtsFeedback> feedbackList= new ArrayList<>();
+        //if (type!=null){
+        List<DtsFeedback> feedbackList = feedbackService.all();//userId, username, page, limit, sort, order
+                /*if (type.equals("优化建议")){
+                    feedbackList = feedbackService.type(type);
+
+                }else if (type.equals("功能异常")){
+
+                    feedbackList = feedbackService.type(type);
+
+                }else {*/
+        //查询全部
+        //feedbackList = feedbackService.all();//userId, username, page, limit, sort, order
+        //}
+        //}
+
+        logger.info("【请求结束】留言查看,响应结果:{}", JSONObject.toJSONString(feedbackList));
+        return Result.success(feedbackList);
     }
 }

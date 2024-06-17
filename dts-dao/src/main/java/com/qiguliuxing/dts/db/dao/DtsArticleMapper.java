@@ -189,4 +189,6 @@ public interface DtsArticleMapper {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int logicalDeleteByPrimaryKey(Integer id);
+
+    boolean updateByIdSelective(DtsArticle record);
 }
