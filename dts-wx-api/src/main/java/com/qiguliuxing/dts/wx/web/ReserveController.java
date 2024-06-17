@@ -1,6 +1,8 @@
 package com.qiguliuxing.dts.wx.web;
 
+import com.qiguliuxing.dts.db.domain.DtsCategory;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
+import com.qiguliuxing.dts.db.service.DtsCategoryService;
 import com.qiguliuxing.dts.db.service.DtsReserveService;
 import com.qiguliuxing.dts.wx.dao.DtsReserveVo;
 import com.qiguliuxing.dts.wx.dao.FreeTimeSolt;
@@ -8,6 +10,7 @@ import com.qiguliuxing.dts.wx.dao.UseTimeSolt;
 import com.qiguliuxing.dts.wx.util.FreeTime;
 import com.qiguliuxing.dts.wx.util.Result;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,12 +30,14 @@ public class ReserveController {
 
     @Resource
     private DtsReserveService dtsReserveService;
+    @Autowired
+    private DtsCategoryService dtsCategoryService;
 
     /**
      * 预约
      * */
     @PostMapping("/reserve")
-    public Result<Boolean> reserve(@RequestBody DtsReserveVo dtsReserveVo) throws ParseException {
+    public synchronized Result<Boolean> reserve(@RequestBody DtsReserveVo dtsReserveVo) throws ParseException {
         //查询当日是否约满，有预约 空闲时间段剩余哪些
         String start = new StringBuilder().append(dtsReserveVo.getDate()).append(" ").append(dtsReserveVo.getStartTime()).toString();
         String end = new StringBuilder().append(dtsReserveVo.getDate()).append(" ").append(dtsReserveVo.getEndTime()).toString();
@@ -46,10 +51,7 @@ public class ReserveController {
         if (full.getCode() == 500){
             return Result.fail(500,full.getMessage());
         }
-        int save = 0;
-        synchronized (this){
-            save = dtsReserveService.save(dtsReserve);
-        }
+        int  save = dtsReserveService.save(dtsReserve);
         if (save>0){
             return new Result<>(200,"预约成功");
         }else {
@@ -163,5 +165,14 @@ public class ReserveController {
             }
         }
         return false;
+    }
+
+    /**
+     * 获取预约活动列表
+     * */
+    @GetMapping("/activeList")
+    public List<DtsCategory> activeList(){
+        List<DtsCategory> dtsCategories = dtsCategoryService.queryChannel();
+        return dtsCategories;
     }
 }

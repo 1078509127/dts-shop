@@ -7,6 +7,8 @@ dts:
     mch-key: 1538xxxxxx-1538xxxxxx-1538xxxxxx
     notify-url: https://test.dtsshop.com/demo/order/dtsNotify
     access-token: https://api.weixin.qq.com/cgi-bin/token
+    template-id: FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk
+    subscribe-url: https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=
     # 商户证书文件路径
     # 请参考“商户证书”一节 https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=4_3
     key-path: xxxxx

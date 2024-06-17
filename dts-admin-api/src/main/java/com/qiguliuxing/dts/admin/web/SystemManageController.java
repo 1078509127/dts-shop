@@ -1,8 +1,8 @@
 package com.qiguliuxing.dts.admin.web;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.fastjson.JSONObject;
 
+import com.alibaba.fastjson.JSONObject;
 import com.qiguliuxing.dts.admin.service.SystemManageService;
 import com.qiguliuxing.dts.admin.util.AuthSupport;
 import com.qiguliuxing.dts.admin.util.Result;
@@ -10,12 +10,17 @@ import com.qiguliuxing.dts.admin.util.WechatUtil;
 import com.qiguliuxing.dts.core.storage.StorageService;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.db.domain.DtsAd;
+import com.qiguliuxing.dts.db.domain.DtsCategory;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
+import com.qiguliuxing.dts.db.domain.DtsUser;
 import com.qiguliuxing.dts.db.service.DtsAdService;
+import com.qiguliuxing.dts.db.service.DtsCategoryService;
+import com.qiguliuxing.dts.db.service.DtsUserService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,8 +45,14 @@ public class SystemManageController {
     private DtsAdService adService;
     @Autowired
     private SystemManageService systemManageService;
-
-
+    @Autowired
+    private DtsUserService dtsUserService;
+    @Autowired
+    private RestTemplate restTemplate;
+    @Autowired
+    private WechatUtil wechatUtil;
+    @Autowired
+    private DtsCategoryService dtsCategoryService;
     /**
      * 轮播图上传
      * */
@@ -69,7 +80,7 @@ public class SystemManageController {
     /**
      * 预约查询
      * */
-    @GetMapping("list")
+    @GetMapping("/list")
     public Result<List<DtsReserve>> list(@RequestParam(required = false) String name){
         List<DtsReserve> list = systemManageService.list(name);
         return Result.success(list);
@@ -95,14 +106,47 @@ public class SystemManageController {
     /**
      * 活动推送
      * */
-    @GetMapping(value = "sendMsg")
-    public String sendMsg(HttpServletRequest request){
+    @GetMapping("/sendMsg")
+    public String sendMsg(@RequestParam(required = true)String message){
+        System.out.println(message);
+        String accessToken = wechatUtil.getAccessToken();
+        List<DtsUser> all = dtsUserService.all();
+        all.stream().forEach(user ->{
+            JSONObject body=new JSONObject();
+            body.put("touser",user.getWeixinOpenid());
+            body.put("template_id","FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
+            body.put("page","pages/appointment/line_up");
+            Map<String,Object> map = new HashMap<>();
+            map.put("thing2","活动主题");
+            map.put("time4","2024-10-11 ~ 2024-10-12");
+            map.put("thing1","dtsadmin");
+            map.put("thing3","大连");
+            map.put("thing7","管委会");
+            body.put("data",map);
+            String result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken, body, String.class);
+            System.out.println(result);
+        });
         return null;
     }
-    private static Map<String, Object> createDataItem(String name, String value) {
-        Map<String, Object> item = new HashMap<>();
-        item.put("value", value);
-        return item;
+
+    /**
+     * 预约通道查询
+     */
+    @GetMapping("/activeList")
+    public List<DtsCategory> activeList(){
+        List<DtsCategory> dtsCategories = dtsCategoryService.queryChannel();
+        return dtsCategories;
     }
 
+    /**
+     * 关闭/开启预约
+     * */
+    @GetMapping("/activeUpdate")
+    public Result<String> activeUpdate(@RequestParam String id,@RequestParam boolean isOpen ){
+        int update = dtsCategoryService.update(id, isOpen);
+        if (update>0){
+            return new Result<>(200,"关闭成功");
+        }
+        return Result.fail("关闭失败");
+    }
 }

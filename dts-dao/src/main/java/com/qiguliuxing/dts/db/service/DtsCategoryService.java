@@ -1,5 +1,8 @@
 package com.qiguliuxing.dts.db.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.github.pagehelper.PageHelper;
 import com.qiguliuxing.dts.db.dao.DtsCategoryMapper;
 import com.qiguliuxing.dts.db.domain.DtsCategory;
@@ -17,7 +20,7 @@ public class DtsCategoryService {
 	@Resource
 	private DtsCategoryMapper categoryMapper;
 	private DtsCategory.Column[] CHANNEL = { DtsCategory.Column.id, DtsCategory.Column.name,
-			DtsCategory.Column.iconUrl };
+			DtsCategory.Column.iconUrl, DtsCategory.Column.isOpen };
 
 	public List<DtsCategory> queryL1WithoutRecommend(int offset, int limit) {
 		DtsCategoryExample example = new DtsCategoryExample();
@@ -96,5 +99,16 @@ public class DtsCategoryService {
 		example.or().andLevelEqualTo("L1").andDeletedEqualTo(false);
 		PageHelper.startPage(1, 9);// 设置分页10
 		return categoryMapper.selectByExampleSelective(example, CHANNEL);
+	}
+
+	public int update(String id, boolean isOpen) {
+		LambdaUpdateWrapper<DtsCategory> updateWrapper = new LambdaUpdateWrapper<>();
+		updateWrapper.eq(DtsCategory::getId,id);
+		if (isOpen){
+			updateWrapper.set(DtsCategory::getIsOpen,1);
+		}else {
+			updateWrapper.set(DtsCategory::getIsOpen,0);
+		}
+		return categoryMapper.update(null, updateWrapper);
 	}
 }

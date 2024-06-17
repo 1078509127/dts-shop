@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -168,5 +169,10 @@ public class DtsUserService {
 
 	public List<DayStatis> recentCount(int statisDaysRang) {
 		return statMapper.statisIncreaseUserCnt(statisDaysRang);
+	}
+
+	public List<DtsUser> all(){
+		LambdaQueryWrapper<DtsUser> queryWrapper = new LambdaQueryWrapper<>();
+		return userMapper.selectList(queryWrapper);
 	}
 }
