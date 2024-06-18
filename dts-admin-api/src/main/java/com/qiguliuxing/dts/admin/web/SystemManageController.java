@@ -1,9 +1,10 @@
 package com.qiguliuxing.dts.admin.web;
 
 import com.alibaba.excel.EasyExcel;
-
 import com.alibaba.fastjson.JSONObject;
+import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
 import com.qiguliuxing.dts.admin.service.SystemManageService;
+import com.qiguliuxing.dts.admin.util.ArticleType;
 import com.qiguliuxing.dts.admin.util.AuthSupport;
 import com.qiguliuxing.dts.admin.util.Result;
 import com.qiguliuxing.dts.admin.util.WechatUtil;
@@ -12,26 +13,23 @@ import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.validator.Order;
 import com.qiguliuxing.dts.core.validator.Sort;
 import com.qiguliuxing.dts.db.domain.*;
-import com.qiguliuxing.dts.db.service.DtsAdService;
-import com.qiguliuxing.dts.db.service.DtsCategoryService;
-import com.qiguliuxing.dts.db.service.DtsFeedbackService;
-import com.qiguliuxing.dts.db.service.DtsUserService;
+import com.qiguliuxing.dts.db.service.*;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/admin/manage")
@@ -55,6 +53,8 @@ public class SystemManageController {
     private DtsCategoryService dtsCategoryService;
     @Autowired
     private DtsFeedbackService feedbackService;
+    @Autowired
+    private DtsArticleService articleService;
 
     /**
      * 轮播图上传
@@ -155,8 +155,8 @@ public class SystemManageController {
     @GetMapping("/getMessage")
     public Object getMessage(Integer userId, String username,String type, @RequestParam(defaultValue = "1") Integer page,
                              @RequestParam(defaultValue = "10") Integer limit,
-                             @Sort @RequestParam(defaultValue = "add_time") String sort//,
-                             ) {//@Order @RequestParam(defaultValue = "desc") String order
+                             @Sort @RequestParam(defaultValue = "add_time")String sort ,
+                             @Order @RequestParam(defaultValue = "desc") String order) {
         logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 用户管理->意见反馈->查询,请求参数:userId:{},username:{},page:{}", userId, username, page);
         //List<DtsFeedback> feedbackList= new ArrayList<>();
         //if (type!=null){
@@ -176,5 +176,46 @@ public class SystemManageController {
 
         logger.info("【请求结束】留言查看,响应结果:{}", JSONObject.toJSONString(feedbackList));
         return Result.success(feedbackList);
+    }
+
+    //活动描述就是公告信息
+    @GetMapping("/detail")
+    public Object detail(@NotNull Integer id) {
+        logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 推广管理->公告管理->详情,请求参数,id:{}", id);
+        DtsArticle article = null;
+        try {
+            article = articleService.findById(id);
+        } catch (Exception e) {
+            logger.error("获取文章公告失败,文章id：{}", id);
+            e.printStackTrace();
+        }
+        // 这里不打印响应结果，文章内容信息较多
+        // logger.info("【请求结束】获取公告文章,响应结果：{}",JSONObject.toJSONString(article));
+        return ResponseUtil.ok(article);
+    }
+    /**
+     * 编辑公告
+     *
+     * @param
+     * @return
+     */
+
+    @RequiresPermissionsDesc(menu = { "推广管理", "公告管理" }, button = "编辑")
+    @PostMapping("/update")
+    public Object update(@RequestBody DtsArticle article) {
+        logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 推广管理->公告管理->编辑,请求参数:{}", JSONObject.toJSONString(article));
+//        Object error = validate(article);
+//        if (error != null) {
+//            return error;
+//        }
+        if (StringUtils.isEmpty(article.getType())) {
+            article.setType(ArticleType.ANNOUNCE.type());//如果没有传入类型，默认为信息公告
+        }
+        if (articleService.updateById(article) == 0) {
+            logger.error("推广管理->公告管理->编辑错误:{}", "更新数据失败");
+            throw new RuntimeException("更新数据失败");
+        }
+        logger.info("【请求结束】推广管理->公告管理->编辑,响应结果:{}", "成功!");
+        return ResponseUtil.ok();
     }
 }
