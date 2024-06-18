@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.qiguliuxing.dts.db.domain.DtsAdminExample;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -74,6 +75,11 @@ public class DtsArticleService {
 
 	//修改公告
 	public boolean updateByIdContent(DtsArticle article) {
+
+//		DtsArticleExample example = new DtsArticleExample();
+//		example.or().andUpdateTimeIn(username).andDeletedEqualTo(false);
+//		return adminMapper.selectByExample(example);
+
 
 		article.setContent(article.getContent());
 		article.setId(article.getId());

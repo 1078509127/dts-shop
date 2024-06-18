@@ -9,6 +9,8 @@ import com.qiguliuxing.dts.admin.util.Result;
 import com.qiguliuxing.dts.admin.util.WechatUtil;
 import com.qiguliuxing.dts.core.storage.StorageService;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
+import com.qiguliuxing.dts.core.validator.Order;
+import com.qiguliuxing.dts.core.validator.Sort;
 import com.qiguliuxing.dts.db.domain.*;
 import com.qiguliuxing.dts.db.service.DtsAdService;
 import com.qiguliuxing.dts.db.service.DtsCategoryService;
@@ -153,8 +155,8 @@ public class SystemManageController {
     @GetMapping("/getMessage")
     public Object getMessage(Integer userId, String username,String type, @RequestParam(defaultValue = "1") Integer page,
                              @RequestParam(defaultValue = "10") Integer limit,
-                             @Sort @RequestParam(defaultValue = "add_time") String sort,
-                             @Order @RequestParam(defaultValue = "desc") String order) {
+                             @Sort @RequestParam(defaultValue = "add_time") String sort//,
+                             ) {//@Order @RequestParam(defaultValue = "desc") String order
         logger.info("【请求开始】操作人:[" + AuthSupport.userName()+ "] 用户管理->意见反馈->查询,请求参数:userId:{},username:{},page:{}", userId, username, page);
         //List<DtsFeedback> feedbackList= new ArrayList<>();
         //if (type!=null){
