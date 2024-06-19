@@ -3,6 +3,8 @@ package com.qiguliuxing.dts.admin.web;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
+import com.qiguliuxing.dts.admin.dao.SubscriberVo;
+import com.qiguliuxing.dts.admin.dao.TemplateData;
 import com.qiguliuxing.dts.admin.service.SystemManageService;
 import com.qiguliuxing.dts.admin.util.ArticleType;
 import com.qiguliuxing.dts.admin.util.AuthSupport;
@@ -113,22 +115,23 @@ public class SystemManageController {
     public String sendMsg(@RequestParam String theme,@RequestParam String time,@RequestParam String provider,@RequestParam String site,@RequestParam String organ,@RequestParam(required = false) String content){
         String accessToken = wechatUtil.getAccessToken();
         List<DtsUser> all = dtsUserService.all();
-        all.stream().forEach(user ->{
-            JSONObject body=new JSONObject();
-            body.put("touser",user.getWeixinOpenid());
-            body.put("template_id","FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
-            body.put("page","pages/appointment/line_up");
-            Map<String,Object> map = new HashMap<>();
-            map.put("thing2",theme);
-            map.put("time4",time);
-            map.put("thing1",provider);
-            map.put("thing3",site);
-            map.put("thing7",organ);
-            body.put("data",map);
-            String result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken, body, String.class);
+        String result = null;
+        for (DtsUser user : all) {
+            SubscriberVo subscriberVo = new SubscriberVo();
+            subscriberVo.setTouser(user.getWeixinOpenid());
+            subscriberVo.setTemplate_id("FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
+            subscriberVo.setPage("pages/appointment/line_up");
+            Map<String,TemplateData> map = new HashMap<>();
+            map.put("thing2",new TemplateData(theme));
+            map.put("time4",new TemplateData(time));
+            map.put("thing1",new TemplateData(provider));
+            map.put("thing3",new TemplateData(site));
+            map.put("thing7",new TemplateData(organ));
+            subscriberVo.setData(map);
+            result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken,subscriberVo, String.class);
             System.out.println(result);
-        });
-        return null;
+        }
+        return result;
     }
 
     /**
