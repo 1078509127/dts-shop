@@ -27,7 +27,7 @@ import java.util.*;
  * */
 @RestController
 @RequestMapping("/wx/reserve")
-public class ReserveController {
+public class WxReserveController {
 
     @Resource
     private DtsReserveService dtsReserveService;
@@ -84,9 +84,9 @@ public class ReserveController {
     /**
      * 查询预约
      * */
-    @GetMapping("selReserve")
-    public Object selReserve(@RequestParam(required = true) String userId) throws ParseException {
-        List<DtsReserve> dtsReserves = dtsReserveService.getList(userId);
+    @GetMapping("/selReserve")
+    public Object selReserve(@RequestParam(required = true) String userId,@RequestParam(required = false) String eventType) throws ParseException {
+        List<DtsReserve> dtsReserves = dtsReserveService.getList(userId,eventType);
         List<DtsReserveVo> dtsReserveVos = new ArrayList<>();
         dtsReserves.stream().forEach(dtsReserve -> {
             DtsReserveVo dtsReserveVo = new DtsReserveVo();

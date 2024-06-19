@@ -9,7 +9,7 @@
             <if test="name != null and name != ''">
                 and user_name LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%') or member_card LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%')
             </if>
-                and DATE_FORMAT(start_time, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+                and DATE_FORMAT(start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
         </where>
     </select>
 </mapper>
