@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.qiguliuxing.dts.db.dao.DtsReserveMapper;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
 import com.qiguliuxing.dts.db.util.DateUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -64,5 +65,26 @@ public class DtsReserveService {
       queryWrapper.ge(DtsReserve::getStartTime,monday);
       queryWrapper.le(DtsReserve::getEndTime,sunday);
       return dtsReserveMapper.selectList(queryWrapper);
+   }
+
+   public int addOrUpdate(Integer userId, String scene) {
+      int flag= 0;
+      LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.eq(DtsReserve::getUserId,userId);
+      queryWrapper.eq(DtsReserve::getScene,scene);
+      DtsReserve dtsReserve = dtsReserveMapper.selectOne(queryWrapper);
+      if (ObjectUtils.isNotEmpty(dtsReserve)){
+         Integer times = dtsReserve.getTimes();
+         times += 1;
+         dtsReserve.setTimes(times);
+         flag = dtsReserveMapper.update(dtsReserve, queryWrapper);
+      }else {
+         DtsReserve reserve = new DtsReserve();
+         reserve.setUserId(userId);
+         reserve.setScene(scene);
+         reserve.setTimes(1);
+         flag = dtsReserveMapper.insert(reserve);
+      }
+      return flag;
    }
 }

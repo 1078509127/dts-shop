@@ -198,4 +198,17 @@ public class WxReserveController {
         return dtsCategories;
     }
 
+    /**
+     * 微信扫一扫调用接口
+     * 健身房/图书馆使用次数
+     * */
+    @GetMapping("/scan")
+    public Result scan(@RequestParam Integer userId,@RequestParam String scene){
+        int i = dtsReserveService.addOrUpdate(userId, scene);
+        if (i>0){
+            return new Result(200,"扫描成功");
+        }else {
+            return new Result(400,"扫描失败");
+        }
+    }
 }

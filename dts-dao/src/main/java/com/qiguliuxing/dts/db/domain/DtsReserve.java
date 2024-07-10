@@ -90,4 +90,10 @@ public class DtsReserve implements Serializable {
     @ExcelIgnore
     private Integer isReserve;
 
+    /**
+     * 健身房/图书管使用次数
+     * */
+    @ExcelIgnore
+    private Integer times;
+
 }

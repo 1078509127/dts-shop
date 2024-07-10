@@ -6,10 +6,7 @@ import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
 import com.qiguliuxing.dts.admin.dao.SubscriberVo;
 import com.qiguliuxing.dts.admin.dao.TemplateData;
 import com.qiguliuxing.dts.admin.service.SystemManageService;
-import com.qiguliuxing.dts.admin.util.ArticleType;
-import com.qiguliuxing.dts.admin.util.AuthSupport;
-import com.qiguliuxing.dts.admin.util.Result;
-import com.qiguliuxing.dts.admin.util.WechatUtil;
+import com.qiguliuxing.dts.admin.util.*;
 import com.qiguliuxing.dts.core.storage.StorageService;
 import com.qiguliuxing.dts.core.util.ResponseUtil;
 import com.qiguliuxing.dts.core.validator.Order;
@@ -21,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -28,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -220,5 +219,18 @@ public class SystemManageController {
         }
         logger.info("【请求结束】推广管理->公告管理->编辑,响应结果:{}", "成功!");
         return ResponseUtil.ok();
+    }
+
+        public static void main(String[] args) throws Exception {
+        String path = ResourceUtils.getURL("classpath:").getPath();
+
+        String imagePath = "C:/Users/Asus/Desktop/tushuguan.jpg";
+        String logo = path.replace("/dts-wx-api/target/classes/", "/doc/youjianshenfang.png");
+        String scene = "图书馆";
+        ZXingUtil.encodeimage(imagePath, "JPEG", scene, 430, 430 , logo);
+        /**
+         * 解密 -->将二维码内部的文字显示出来
+         */
+        ZXingUtil.decodeImage(new File(imagePath));
     }
 }
