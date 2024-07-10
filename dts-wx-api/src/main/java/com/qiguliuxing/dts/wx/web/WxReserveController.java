@@ -22,6 +22,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.qiguliuxing.dts.wx.util.DateCalculator.getMondayOfWeek;
+import static com.qiguliuxing.dts.wx.util.DateCalculator.getSundayOfWeek;
+
 /**
  * 活动场所预约
  * */
@@ -48,7 +51,7 @@ public class WxReserveController {
         dtsReserve.setEndTime(sdf.parse(end));
         dtsReserve.setIsReserve(0);
         BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
-        Result<String> full = this.isFull(dtsReserveVo.getScene(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00");
+        Result<String> full = this.isFull(dtsReserveVo.getScene(),dtsReserveVo.getUserId(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00");
         if (full.getCode() == 500){
             return Result.fail(500,full.getMessage());
         }
@@ -78,7 +81,6 @@ public class WxReserveController {
         }else {
             return Result.fail("取消失败");
         }
-
     }
 
     /**
@@ -108,12 +110,20 @@ public class WxReserveController {
     }
 
     @GetMapping("/isFull")
-    public Result<String> isFull(@RequestParam String scene,@RequestParam String date,@RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime) throws ParseException {
+    public Result<String> isFull(@RequestParam String scene,@RequestParam Integer userId,@RequestParam String date,@RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date dates = sdf.parse(date);
+        Date monday = getMondayOfWeek(dates);
+        Date sunday = getSundayOfWeek(dates);
+        List<DtsReserve> byWeek = dtsReserveService.getByWeek(userId,monday, sunday);
+        if (byWeek.size() >= 2){
+            return Result.fail(500,"每周至多可预约两次");
+        }
         //查询选择日是否约满，约满直接返回fail
         FreeTime freeTime = new FreeTime();
         List<UseTimeSolt> useList = new ArrayList<>();
-        LocalTime openTime = LocalTime.of(9, 0);//开放时间
-        LocalTime closeTime = LocalTime.of(18, 0);//关闭时间
+        LocalTime openTime = LocalTime.of(15, 0);//开放时间
+        LocalTime closeTime = LocalTime.of(20, 0);//关闭时间
 
         //查询当日是否有预约，无预约直接返回，有预约判断是否约满、预约时间段和库中数据是否有时间重叠
         List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null);
