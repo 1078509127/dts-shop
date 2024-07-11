@@ -36,7 +36,115 @@ public class WxReserveController {
     private DtsReserveService dtsReserveService;
     @Autowired
     private DtsCategoryService dtsCategoryService;
+    List<String> Day = new ArrayList<>();
 
+    /**
+     *
+    团队预约
+     */
+    @PostMapping("/teamReserve")
+    public synchronized Result<Boolean> teamReserve(@RequestBody DtsReserveVo dtsReserveVo) throws ParseException {
+        //查询当日是否约满，有预约 空闲时间段剩余哪些
+        String start = new StringBuilder().append(dtsReserveVo.getDate()).append(" 00:00:00").toString();
+        String end = new StringBuilder().append(dtsReserveVo.getDate()).append(" 00:00:00").toString();
+        SimpleDateFormat sdf =  new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+        DtsReserve dtsReserve = new DtsReserve();
+        dtsReserve.setStartTime(sdf.parse(start));
+        dtsReserve.setEndTime(sdf.parse(end));
+        dtsReserve.setIsReserve(0);
+        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
+        Result<String> full = this.teamisFull(dtsReserveVo.getScene(), dtsReserveVo.getDate(),dtsReserveVo.getEventType() );
+        if (full.getCode() == 500){
+            return Result.fail(500,full.getMessage());
+        }
+        int  save = dtsReserveService.save(dtsReserve);
+        if (save>0){
+            return new Result<>(200,"预约成功");
+        }else {
+            return Result.fail("预约失败");
+        }
+    }
+
+    /**
+     团队预约查询
+     */
+
+    @GetMapping("/teamisFull")
+    public Result<String> teamisFull(@RequestParam String scene,@RequestParam String date,@RequestParam(required = false) String eventType) throws ParseException {
+        List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null);
+        if (byDay.isEmpty()){
+            return Result.success("可预约");
+        }else {
+            //有日期已经被预约过
+
+            SimpleDateFormat s= new SimpleDateFormat("yyyy-MM-dd");
+            Date d =  s.parse(date);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(d);
+            // 增加一个月
+            calendar.add(Calendar.MONTH, 1);
+
+            Date next= calendar.getTime();
+            System.out.print(next);
+            String  dateend = s.format(next);
+            // 查询已经被预约过的日期
+            List<DtsReserve> byDayed =  dtsReserveService.getMonDateed(scene,eventType,date,dateend);
+            byDayed.stream().forEach( time ->{
+
+                SimpleDateFormat sDate= new SimpleDateFormat("yyyy-MM-dd");
+                String DateDay =  sDate.format(time.getStartTime());
+                // 数据库已预约过的日期
+                Day.add(DateDay);
+
+            });
+            // 预约区间 获取每一天 listDay
+            List<String> listDay= new ArrayList<>();
+            listDay= getBetweenDate(date,dateend);
+
+            for (int j=0;j<listDay.size();j++){
+                for (int i=0;i<Day.size();i++){
+                    if (listDay.get(j).contains(Day.get(i))){
+                        listDay.remove(j);//得到可预约的日期
+
+                    }
+                }
+
+            }
+            System.out.println(listDay);
+            return Result.fail(500,"只有"+listDay+"时间段可预约");
+        }
+        //return Result.success("可预约");
+    }
+    //预约过日期
+    //预约过日期
+    public  List<String> getBetweenDate(String begin,String end){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        List<String> betweenList = new ArrayList<String>();
+        Boolean dateFlag= false;
+        try{
+            Calendar startDay = Calendar.getInstance();
+            startDay.setTime(format.parse(begin));
+            startDay.add(Calendar.DATE, -1);
+
+            while(true){
+                startDay.add(Calendar.DATE, 1);
+                Date newDate = startDay.getTime();
+                String newend=format.format(newDate);
+                betweenList.add(newend);
+
+                if(end.equals(newend)){
+                    break;
+                }
+
+
+
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return betweenList;
+    }
     /**
      * 预约
      * */

@@ -67,6 +67,16 @@ public class DtsReserveService {
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
+   public List<DtsReserve> getMonDateed(String scene,String eventType,String date,String endDate) {
+      LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+      //queryWrapper.eq(DtsReserve::getScene,scene);
+      queryWrapper.eq(DtsReserve::getEventType,eventType);
+      queryWrapper.ge(DtsReserve::getStartTime,date);
+      queryWrapper.le(DtsReserve::getEndTime, endDate);
+      return dtsReserveMapper.selectList(queryWrapper);
+   }
+
+
    public int addOrUpdate(Integer userId, String scene) {
       int flag= 0;
       LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
