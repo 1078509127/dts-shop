@@ -227,19 +227,6 @@ public class SystemManageController {
         return ResponseUtil.ok();
     }
 
-        public static void main(String[] args) throws Exception {
-        String path = ResourceUtils.getURL("classpath:").getPath();
-
-        String imagePath = "C:/Users/Asus/Desktop/tushuguan.jpg";
-        String logo = path.replace("/dts-wx-api/target/classes/", "/doc/youjianshenfang.png");
-        String scene = "图书馆";
-        ZXingUtil.encodeimage(imagePath, "JPEG", scene, 430, 430 , logo);
-        /**
-         * 解密 -->将二维码内部的文字显示出来
-         */
-        ZXingUtil.decodeImage(new File(imagePath));
-    }
-
     @GetMapping("/QRcode")
     public void QRcode(@RequestParam String scene,HttpServletResponse response) throws IOException, WriterException {
         // 设置响应流信息

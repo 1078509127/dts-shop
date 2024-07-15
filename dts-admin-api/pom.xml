@@ -59,13 +59,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <classifier>exec</classifier>
+                    <mainClass>com.qiguliuxing.dts.admin.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+<!--                        <configuration>-->
+<!--                            <classifier>exec</classifier>-->
+<!--                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>
