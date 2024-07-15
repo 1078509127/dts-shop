@@ -2,6 +2,9 @@ package com.qiguliuxing.dts.admin.web;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import com.qiguliuxing.dts.admin.annotation.RequiresPermissionsDesc;
 import com.qiguliuxing.dts.admin.dao.SubscriberVo;
 import com.qiguliuxing.dts.admin.dao.TemplateData;
@@ -26,8 +29,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -232,5 +238,24 @@ public class SystemManageController {
          * 解密 -->将二维码内部的文字显示出来
          */
         ZXingUtil.decodeImage(new File(imagePath));
+    }
+
+    @GetMapping("/QRcode")
+    public void QRcode(@RequestParam String scene,HttpServletResponse response) throws IOException, WriterException {
+        // 设置响应流信息
+        response.setContentType("image/jpg");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        OutputStream stream = response.getOutputStream();
+
+        //String scene = "图书馆";
+        String path = ResourceUtils.getURL("classpath:").getPath();
+        String logo = path.replace("/dts-wx-api/target/classes/", "/doc/youjianshenfang.png");
+        BitMatrix encodeimage = ZXingUtil.encodeimage("imagePath", "JPEG", scene, 430, 430, logo);
+
+        //以流的形式输出到前端
+        MatrixToImageWriter.writeToStream(encodeimage , "jpg" , stream);
     }
 }

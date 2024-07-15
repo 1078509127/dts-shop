@@ -45,7 +45,7 @@ public class ZXingUtil {
      * @throws WriterException
      * @throws IOException
      */
-    public static void encodeimage(String imagePath , String format , String content , int width , int height , String logo) throws WriterException, IOException{
+    public static BitMatrix encodeimage(String imagePath , String format , String content , int width , int height , String logo) throws WriterException, IOException{
 
         Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType , Object>();
         //容错率:L(7%)<M(15%)<Q(25%)<H(35%);H容错率最高
@@ -55,39 +55,8 @@ public class ZXingUtil {
         //外边距
         hints.put(EncodeHintType.MARGIN, 1);
 
-        /***
-         * BarcodeFormat.QR_CODE:解析什么类型的文件：要解析的二维码的类型
-         * content：解析文件的内容
-         * width：生成二维码的宽
-         * height:生成二维码的高
-         * hints:涉及到加密用到的参数: 即 编码 和容错率
-         */
         BitMatrix bitMatrix = new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height , hints);
-        //使BufferedImage勾画QRCode  (matrixWidth 是行二维码像素点)
-        int matrixWidth = bitMatrix.getWidth();
-
-        /**
-         * 内存中的一张图片:是RenderedImage的子类，而RenderedImage是一个接口
-         * 此时需要的图片是一个二维码-->需要一个boolean[][]数组存放二维码 --->Boolean数组是由BitMatrix产生的
-         * BufferedImage.TYPE_INT_RGB : 表示生成图片的类型： 此处是RGB模式
-         */
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        //生成二维数组
-        for(int x=0;x<matrixWidth;x++){
-            for(int y=0 ; y<matrixWidth;y++){
-                //二维坐标整个区域：画什么颜色
-                img.setRGB(x, y, bitMatrix.get(x, y) ? BLACK : WHITE);
-            }
-        }
-
-        //画log
-        img = logoImg(img, logo);
-
-        //将二维码图片转换成文件
-        File file = new File(imagePath);
-        //生成图片
-        ImageIO.write(img, format, file);
-
+        return bitMatrix;
     }
 
     /**

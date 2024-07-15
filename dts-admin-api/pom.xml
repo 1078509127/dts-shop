@@ -2,14 +2,14 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-	<groupId>com.qiguliuxing</groupId>
-    <artifactId>dts</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
   <artifactId>dts-admin-api</artifactId>
   <packaging>jar</packaging>
 
+    <parent>
+        <groupId>com.qiguliuxing</groupId>
+        <artifactId>dts-shop-api</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -59,18 +59,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <executable>true</executable>
-                    <!--增加jvm参数-->
-                    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+                    <classifier>exec</classifier>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
-                        <configuration>
-                            <classifier>exec</classifier>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
