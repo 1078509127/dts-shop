@@ -26,6 +26,7 @@ public class UserInfo implements Serializable {
 	
 	private Byte status;//状态
 	private String registerDate;//注册日期
+	private String roleIds;//角色权限
 
 	public String getCountry() {
 		return country;
@@ -130,5 +131,12 @@ public class UserInfo implements Serializable {
 	public void setStatus(Byte status) {
 		this.status = status;
 	}
-	
+
+	public String getRoleIds() {
+		return roleIds;
+	}
+
+	public void setRoleIds(String roleIds) {
+		this.roleIds = roleIds;
+	}
 }
