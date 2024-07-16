@@ -11,15 +11,15 @@ import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_NAME_REGISTERED;
 import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_OPENID_BINDED;
 import static com.qiguliuxing.dts.wx.util.WxResponseCode.AUTH_OPENID_UNACCESS;
 
+import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.qiguliuxing.dts.db.service.DtsRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +68,9 @@ public class WxAuthController {
 
 	@Autowired
 	private DtsUserService userService;
+
+	@Autowired
+	private DtsRoleService dtsRoleService;
 
 	@Autowired
 	private WxMaService wxService;
@@ -187,7 +190,8 @@ public class WxAuthController {
 		}
 
 		DtsUser user = userService.queryByOid(openId);
-		
+
+
 		if (user == null) {
 			user = new DtsUser();
 			user.setUsername(openId);
@@ -232,13 +236,18 @@ public class WxAuthController {
 		if (!StringUtils.isEmpty(user.getMobile())) {// 手机号存在则设置
 			userInfo.setPhone(user.getMobile());
 		}
+		if (!StringUtils.isEmpty(user.getRoleIds())) {// 获取角色
+			Integer i = Integer.valueOf(user.getRoleIds());
+			Set<String> roles = dtsRoleService.queryByIds(new Integer[]{i});
+			userInfo.setRoleIds(new ArrayList<>(roles).get(0));
+		}
 		try {
-			String registerDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-					.format(user.getAddTime() != null ? user.getAddTime() : LocalDateTime.now());
+			String registerDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(user.getAddTime() != null ? user.getAddTime() : LocalDateTime.now());
 			userInfo.setRegisterDate(registerDate);
 			userInfo.setStatus(user.getStatus());
 			userInfo.setUserLevel(user.getUserLevel());// 用户层级
 			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+
 		} catch (Exception e) {
 			logger.error("微信登录：设置用户指定信息出错："+e.getMessage());
 			e.printStackTrace();
