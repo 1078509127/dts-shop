@@ -92,7 +92,7 @@ public class AdminAdController {
 		return ResponseUtil.ok(brand);
 	}
 
-	@RequiresPermissions("admin:ad:update")
+	//@RequiresPermissions("admin:ad:update")
 	@RequiresPermissionsDesc(menu = { "推广管理", "广告管理" }, button = "编辑")
 	@PostMapping("/update")
 	public Object update(@RequestBody DtsAd ad) {
@@ -111,7 +111,7 @@ public class AdminAdController {
 		return ResponseUtil.ok(ad);
 	}
 
-	@RequiresPermissions("admin:ad:delete")
+	//@RequiresPermissions("admin:ad:delete")
 	@RequiresPermissionsDesc(menu = { "推广管理", "广告管理" }, button = "删除")
 	@PostMapping("/delete")
 	public Object delete(@RequestBody DtsAd ad) {
