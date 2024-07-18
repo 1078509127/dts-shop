@@ -21,7 +21,7 @@ public class DtsReserve implements Serializable {
     /**
      *用户id
      * */
-    @ExcelIgnore
+    @ExcelProperty("id")
     private Integer userId;
     /**
      *个人姓名/团队负责人姓名

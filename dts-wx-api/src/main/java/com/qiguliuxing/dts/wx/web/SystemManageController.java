@@ -96,7 +96,7 @@ public class SystemManageController {
      * 导出
      * */
     @GetMapping("/download")
-    public void download(HttpServletResponse response) throws IOException {
+    public void download(HttpServletResponse response, @RequestParam String date ) throws IOException {
         List<DtsReserve> list = systemManageService.all();
         // 这里的 ContentType 要和前端请求携带的 ContentType 相对应
         response.setContentType("application/vnd.ms-excel");
