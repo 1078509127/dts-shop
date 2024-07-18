@@ -83,6 +83,9 @@ public class DtsReserve implements Serializable {
      * */
     @ExcelProperty("场景")
     private String scene;
+
+    @ExcelProperty("创建时间")
+    private Date createTime;
     /**
      *是否取消（0预约/1取消）
      * */
@@ -93,7 +96,7 @@ public class DtsReserve implements Serializable {
     /**
      * 健身房/图书管使用次数
      * */
-    @ExcelIgnore
+    @ExcelProperty("进场次数")
     private Integer times;
 
 }

@@ -92,6 +92,9 @@ public class DtsReserveService {
          DtsReserve reserve = new DtsReserve();
          reserve.setUserId(userId);
          reserve.setScene(scene);
+         reserve.setCreateTime(new Date());
+         reserve.setIsReserve(0);
+         reserve.setEventType("个人预约");
          reserve.setTimes(1);
          flag = dtsReserveMapper.insert(reserve);
       }

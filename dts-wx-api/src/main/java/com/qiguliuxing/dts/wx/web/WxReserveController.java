@@ -158,6 +158,7 @@ public class WxReserveController {
         dtsReserve.setStartTime(sdf.parse(start));
         dtsReserve.setEndTime(sdf.parse(end));
         dtsReserve.setIsReserve(0);
+        dtsReserve.setCreateTime(new Date());
         BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         Result<String> full = this.isFull(dtsReserveVo.getScene(),dtsReserveVo.getUserId(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00");
         if (full.getCode() == 500){
@@ -314,9 +315,9 @@ public class WxReserveController {
     public Result scan(@RequestParam Integer userId,@RequestParam String scene){
         int i = dtsReserveService.addOrUpdate(userId, scene);
         if (i>0){
-            return new Result(200,"扫描成功");
+            return new Result(200,"扫码成功");
         }else {
-            return new Result(400,"扫描失败");
+            return new Result(400,"扫码失败");
         }
     }
 }
