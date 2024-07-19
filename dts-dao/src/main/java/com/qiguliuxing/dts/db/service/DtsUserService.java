@@ -61,6 +61,7 @@ public class DtsUserService {
 		return userMapper.updateByPrimaryKeySelective(user);
 	}
 
+
 	public List<DtsUser> querySelective(String username, String mobile, Integer page, Integer size, String sort,
 			String order) {
 		DtsUserExample example = new DtsUserExample();
@@ -110,6 +111,11 @@ public class DtsUserService {
 	public List<DtsUser> queryByOpenid(String openid) {
 		DtsUserExample example = new DtsUserExample();
 		example.or().andWeixinOpenidEqualTo(openid).andDeletedEqualTo(false);
+		return userMapper.selectByExample(example);
+	}
+	public List<DtsUser> queryByUserid(String userid) {
+		DtsUserExample example = new DtsUserExample();
+		example.or().andWeixinOpenidEqualTo(userid).andDeletedEqualTo(false);
 		return userMapper.selectByExample(example);
 	}
 

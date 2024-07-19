@@ -122,7 +122,7 @@ public class WxAuthController {
 		UserInfo userInfo = new UserInfo();
 		userInfo.setNickName(username);
 		userInfo.setAvatarUrl(user.getAvatar());
-		
+
 		try {
 			String registerDate = new SimpleDateFormat("yyyy-MM-dd")
 					.format(user.getAddTime() == null ? user.getAddTime() : LocalDateTime.now());
@@ -194,8 +194,6 @@ public class WxAuthController {
 
 		if (user == null) {
 			user = new DtsUser();
-			SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
-			user.setId(idGenerator.generateId());
 			user.setUsername(openId);
 			user.setPassword(openId);
 			user.setWeixinOpenid(openId);
@@ -215,6 +213,7 @@ public class WxAuthController {
 		} else {
 			user.setLastLoginTime(LocalDateTime.now());
 			user.setLastLoginIp(IpUtil.client(request));
+
 			if (userService.updateById(user) == 0) {
 				return ResponseUtil.updatedDataFailed();
 			}
@@ -235,6 +234,7 @@ public class WxAuthController {
 		result.put("token", userToken.getToken());
 		result.put("tokenExpire", userToken.getExpireTime().toString());
 		userInfo.setUserId(user.getId());
+		userInfo.setNickName(user.getNickname());//用户名
 		if (!StringUtils.isEmpty(user.getMobile())) {// 手机号存在则设置
 			userInfo.setPhone(user.getMobile());
 		}
@@ -249,6 +249,7 @@ public class WxAuthController {
 			userInfo.setStatus(user.getStatus());
 			userInfo.setUserLevel(user.getUserLevel());// 用户层级
 			userInfo.setUserLevelDesc(UserTypeEnum.getInstance(user.getUserLevel()).getDesc());// 用户层级描述
+			//userInfo.setNickName();
 
 		} catch (Exception e) {
 			logger.error("微信登录：设置用户指定信息出错："+e.getMessage());
@@ -285,10 +286,10 @@ public class WxAuthController {
 		}
 		String code = CharUtil.getRandomNum(6);
 		SmsResult smsResult = notifyService.notifySmsTemplate(phoneNumber, NotifyType.CAPTCHA, new String[] { code, "1" });
-        if (smsResult != null) {
-        	logger.info("*****腾讯云短信发送->请求验证码，短信发送结果：{}",JSONObject.toJSONString(smsResult));
-        }
-		
+		if (smsResult != null) {
+			logger.info("*****腾讯云短信发送->请求验证码，短信发送结果：{}",JSONObject.toJSONString(smsResult));
+		}
+
 		boolean successful = CaptchaCodeManager.addToCache(phoneNumber, code,1);
 		if (!successful) {
 			logger.error("请求验证码出错:{}", AUTH_CAPTCHA_FREQUENCY.desc());
@@ -315,69 +316,52 @@ public class WxAuthController {
 		logger.info("【请求开始】账号注册,请求参数，body:{}", body);
 
 		String username = JacksonUtil.parseString(body, "username");
-		String password = JacksonUtil.parseString(body, "password");
 		String mobile = JacksonUtil.parseString(body, "mobile");
-		String code = JacksonUtil.parseString(body, "code");
-		String wxCode = JacksonUtil.parseString(body, "wxCode");
+		String userid = JacksonUtil.parseString(body, "userid");
 
-		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(mobile)
-				|| StringUtils.isEmpty(wxCode) || StringUtils.isEmpty(code)) {
+		if (StringUtils.isEmpty(username)  || StringUtils.isEmpty(mobile)) {
 			return ResponseUtil.badArgument();
 		}
 
-		List<DtsUser> userList = userService.queryByUsername(username);
-		if (userList.size() > 0) {
-			logger.error("请求账号注册出错:{}", AUTH_NAME_REGISTERED.desc());
-			return WxResponseUtil.fail(AUTH_NAME_REGISTERED);
-		}
+//		List<DtsUser> userList = userService.queryByUsername(username);
+//		if (userList.size() > 0) {
+//			logger.error("请求账号注册出错:{}", AUTH_NAME_REGISTERED.desc());
+//			return WxResponseUtil.fail(AUTH_NAME_REGISTERED);
+//		}
 
-		userList = userService.queryByMobile(mobile);
+		List<DtsUser> userList = userService.queryByMobile(mobile);
 		if (userList.size() > 0) {
 			logger.error("请求账号注册出错:{}", AUTH_MOBILE_REGISTERED.desc());
 			return WxResponseUtil.fail(AUTH_MOBILE_REGISTERED);
 		}
+
+
+
+		if (userList.size() > 0) {
+			logger.error("请求账号注册出错:{}", AUTH_MOBILE_REGISTERED.desc());
+			return WxResponseUtil.fail(AUTH_MOBILE_REGISTERED);
+		}
+
 		if (!RegexUtil.isMobileExact(mobile)) {
 			logger.error("请求账号注册出错:{}", AUTH_INVALID_MOBILE.desc());
 			return WxResponseUtil.fail(AUTH_INVALID_MOBILE);
 		}
-		// 判断验证码是否正确
-		String cacheCode = CaptchaCodeManager.getCachedCaptcha(mobile);
-		if (cacheCode == null || cacheCode.isEmpty() || !cacheCode.equals(code)) {
-			logger.error("请求账号注册出错:{}", AUTH_CAPTCHA_UNMATCH.desc());
-			return WxResponseUtil.fail(AUTH_CAPTCHA_UNMATCH);
-		}
+		// 查询用户ID
+		DtsUser userListByUserid = userService.findById(Integer.parseInt(userid));
 
-		String openId = null;
-		try {
-			WxMaJscode2SessionResult result = this.wxService.getUserService().getSessionInfo(wxCode);
-			openId = result.getOpenid();
-		} catch (Exception e) {
-			logger.error("请求账号注册出错:{}", AUTH_OPENID_UNACCESS.desc());
-			e.printStackTrace();
-			return WxResponseUtil.fail(AUTH_OPENID_UNACCESS);
-		}
-		userList = userService.queryByOpenid(openId);
-		if (userList.size() > 1) {
-			return ResponseUtil.serious();
-		}
 		if (userList.size() == 1) {
 			DtsUser checkUser = userList.get(0);
 			String checkUsername = checkUser.getUsername();
-			String checkPassword = checkUser.getPassword();
-			if (!checkUsername.equals(openId) || !checkPassword.equals(openId)) {
-				logger.error("请求账号注册出错:{}", AUTH_OPENID_BINDED.desc());
-				return WxResponseUtil.fail(AUTH_OPENID_BINDED);
-			}
+			String checkMobile = checkUser.getMobile();
+
 		}
 
 		DtsUser user = null;
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		String encodedPassword = encoder.encode(password);
 		user = new DtsUser();
+		user.setId(Integer.parseInt(userid));
 		user.setUsername(username);
-		user.setPassword(encodedPassword);
 		user.setMobile(mobile);
-		user.setWeixinOpenid(openId);
 		user.setAvatar(CommConsts.DEFAULT_AVATAR);
 		user.setNickname(username);
 		user.setGender((byte) 0);
@@ -385,40 +369,139 @@ public class WxAuthController {
 		user.setStatus((byte) 0);
 		user.setLastLoginTime(LocalDateTime.now());
 		user.setLastLoginIp(IpUtil.client(request));
-		userService.add(user);
 
-		// 给新用户发送注册优惠券
-		try {
-			couponAssignService.assignForRegister(user.getId());
-		} catch (Exception e) {
-			logger.error("账号注册失败,给新用户发送注册优惠券失败：{}", user.getId());
-			e.printStackTrace();
-			return ResponseUtil.fail();
+		if (userListByUserid.getId()!=null&& userListByUserid.getId()!=0){
+			// 修改该ID 用户信息
+			userService.updateById(user);
+		}else {
+			// 添加user信息
+			userService.add(user);
+
 		}
+
 
 		// userInfo
 		UserInfo userInfo = new UserInfo();
 		userInfo.setNickName(username);
 		userInfo.setAvatarUrl(user.getAvatar());
 
-		// token
-		UserToken userToken = null;
-		try {
-			userToken = UserTokenManager.generateToken(user.getId());
-		} catch (Exception e) {
-			logger.error("账号注册失败,生成token失败：{}", user.getId());
-			e.printStackTrace();
-			return ResponseUtil.fail();
-		}
 
 		Map<Object, Object> result = new HashMap<Object, Object>();
-		result.put("token", userToken.getToken());
-		result.put("tokenExpire", userToken.getExpireTime().toString());
 		result.put("userInfo", userInfo);
 
 		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
 		return ResponseUtil.ok(result);
 	}
+
+//	@PostMapping("register")
+//	public Object register(@RequestBody String body, HttpServletRequest request) {
+//		logger.info("【请求开始】账号注册,请求参数，body:{}", body);
+//
+//		String username = JacksonUtil.parseString(body, "username");
+//		String password = JacksonUtil.parseString(body, "password");
+//		String mobile = JacksonUtil.parseString(body, "mobile");
+//		String code = JacksonUtil.parseString(body, "code");
+//		String wxCode = JacksonUtil.parseString(body, "wxCode");
+//
+//		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(mobile)
+//				|| StringUtils.isEmpty(wxCode) || StringUtils.isEmpty(code)) {
+//			return ResponseUtil.badArgument();
+//		}
+//
+//		List<DtsUser> userList = userService.queryByUsername(username);
+//		if (userList.size() > 0) {
+//			logger.error("请求账号注册出错:{}", AUTH_NAME_REGISTERED.desc());
+//			return WxResponseUtil.fail(AUTH_NAME_REGISTERED);
+//		}
+//
+//		userList = userService.queryByMobile(mobile);
+//		if (userList.size() > 0) {
+//			logger.error("请求账号注册出错:{}", AUTH_MOBILE_REGISTERED.desc());
+//			return WxResponseUtil.fail(AUTH_MOBILE_REGISTERED);
+//		}
+//		if (!RegexUtil.isMobileExact(mobile)) {
+//			logger.error("请求账号注册出错:{}", AUTH_INVALID_MOBILE.desc());
+//			return WxResponseUtil.fail(AUTH_INVALID_MOBILE);
+//		}
+//		// 判断验证码是否正确
+//		String cacheCode = CaptchaCodeManager.getCachedCaptcha(mobile);
+//		if (cacheCode == null || cacheCode.isEmpty() || !cacheCode.equals(code)) {
+//			logger.error("请求账号注册出错:{}", AUTH_CAPTCHA_UNMATCH.desc());
+//			return WxResponseUtil.fail(AUTH_CAPTCHA_UNMATCH);
+//		}
+//
+//		String openId = null;
+//		try {
+//			WxMaJscode2SessionResult result = this.wxService.getUserService().getSessionInfo(wxCode);
+//			openId = result.getOpenid();
+//		} catch (Exception e) {
+//			logger.error("请求账号注册出错:{}", AUTH_OPENID_UNACCESS.desc());
+//			e.printStackTrace();
+//			return WxResponseUtil.fail(AUTH_OPENID_UNACCESS);
+//		}
+//		userList = userService.queryByOpenid(openId);
+//		if (userList.size() > 1) {
+//			return ResponseUtil.serious();
+//		}
+//		if (userList.size() == 1) {
+//			DtsUser checkUser = userList.get(0);
+//			String checkUsername = checkUser.getUsername();
+//			String checkPassword = checkUser.getPassword();
+//			if (!checkUsername.equals(openId) || !checkPassword.equals(openId)) {
+//				logger.error("请求账号注册出错:{}", AUTH_OPENID_BINDED.desc());
+//				return WxResponseUtil.fail(AUTH_OPENID_BINDED);
+//			}
+//		}
+//
+//		DtsUser user = null;
+//		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//		String encodedPassword = encoder.encode(password);
+//		user = new DtsUser();
+//		user.setUsername(username);
+//		user.setPassword(encodedPassword);
+//		user.setMobile(mobile);
+//		user.setWeixinOpenid(openId);
+//		user.setAvatar(CommConsts.DEFAULT_AVATAR);
+//		user.setNickname(username);
+//		user.setGender((byte) 0);
+//		user.setUserLevel((byte) 0);
+//		user.setStatus((byte) 0);
+//		user.setLastLoginTime(LocalDateTime.now());
+//		user.setLastLoginIp(IpUtil.client(request));
+//		userService.add(user);
+//
+//		// 给新用户发送注册优惠券
+//		try {
+//			couponAssignService.assignForRegister(user.getId());
+//		} catch (Exception e) {
+//			logger.error("账号注册失败,给新用户发送注册优惠券失败：{}", user.getId());
+//			e.printStackTrace();
+//			return ResponseUtil.fail();
+//		}
+//
+//		// userInfo
+//		UserInfo userInfo = new UserInfo();
+//		userInfo.setNickName(username);
+//		userInfo.setAvatarUrl(user.getAvatar());
+//
+//		// token
+//		UserToken userToken = null;
+//		try {
+//			userToken = UserTokenManager.generateToken(user.getId());
+//		} catch (Exception e) {
+//			logger.error("账号注册失败,生成token失败：{}", user.getId());
+//			e.printStackTrace();
+//			return ResponseUtil.fail();
+//		}
+//
+//		Map<Object, Object> result = new HashMap<Object, Object>();
+//		result.put("token", userToken.getToken());
+//		result.put("tokenExpire", userToken.getExpireTime().toString());
+//		result.put("userInfo", userInfo);
+//
+//		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
+//		return ResponseUtil.ok(result);
+//	}
 
 	/**
 	 * 账号密码重置
@@ -477,7 +560,7 @@ public class WxAuthController {
 
 	/**
 	 * 绑定手机号码
-	 * 
+	 *
 	 * @param userId
 	 * @param body
 	 * @return
@@ -513,7 +596,7 @@ public class WxAuthController {
 
 	/**
 	 * 注销登录
-	 * 
+	 *
 	 * @param userId
 	 * @return
 	 */

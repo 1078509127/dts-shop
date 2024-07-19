@@ -157,4 +157,6 @@ public interface DtsCategoryMapper extends BaseMapper<DtsCategory> {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int logicalDeleteByPrimaryKey(Integer id);
+
+    List<DtsCategory> selectAll();
 }

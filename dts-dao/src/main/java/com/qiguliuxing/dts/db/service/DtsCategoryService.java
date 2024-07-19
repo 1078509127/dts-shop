@@ -111,4 +111,12 @@ public class DtsCategoryService {
 		}
 		return categoryMapper.update(null, updateWrapper);
 	}
+
+	public List<DtsCategory> selectAll() {
+
+		LambdaQueryWrapper<DtsCategory> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.select(DtsCategory::getName,DtsCategory::getDesc,DtsCategory::getIconUrl);
+
+		return categoryMapper.selectList(queryWrapper);
+	}
 }
