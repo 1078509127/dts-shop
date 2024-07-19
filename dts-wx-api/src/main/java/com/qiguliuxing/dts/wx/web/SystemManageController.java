@@ -1,6 +1,9 @@
 package com.qiguliuxing.dts.wx.web;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.fastjson.JSONObject;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -30,9 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/wx/manage")
@@ -97,15 +98,33 @@ public class SystemManageController {
      * */
     @GetMapping("/download")
     public void download(HttpServletResponse response, @RequestParam String date ) throws IOException {
-        List<DtsReserve> list = systemManageService.all();
         // 这里的 ContentType 要和前端请求携带的 ContentType 相对应
         response.setContentType("application/vnd.ms-excel");
         response.setCharacterEncoding("utf-8");
         // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
-        //String fileName = URLEncoder.encode("测试", "UTF-8");
         response.setHeader("Content-disposition", "attachment;filename="  + "预约报表.xlsx");
-        // DownloadData 是实体类，sheet 里面是 sheet 名称，doWrite 里面放要写入的数据，类型为 List<DownloadData>
-        EasyExcel.write(response.getOutputStream(), DtsReserve.class).autoCloseStream(Boolean.FALSE).sheet("报表").doWrite(list);
+        List<String> string1 = Arrays.asList(new String[]{"乒乓球馆", "微机室", "瑜伽室", "书法室", "录音室", "烘培室"});
+        List<DtsReserve> list1 = systemManageService.getData(date,string1);
+        //去除指定列
+        List<String> excludeColumnNames = new ArrayList<>();
+        excludeColumnNames.add("times");
+        ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build();
+        WriteSheet sheet1 = EasyExcel.writerSheet(0, "报表1").head(DtsReserve.class).excludeColumnFiledNames(excludeColumnNames).build();
+        excelWriter.write(list1, sheet1);
+
+        List<String> string2 = Arrays.asList(new String[]{"健身房", "图书馆"});
+        List<DtsReserve> list2 = systemManageService.getData(date,string2);
+        //只包含指定列
+        List<String> includeColumnNames  = new ArrayList<>();
+        includeColumnNames.add("userId");
+        includeColumnNames.add("userName");
+        includeColumnNames.add("phone");
+        includeColumnNames.add("eventType");
+        includeColumnNames.add("scene");
+        includeColumnNames.add("times");
+        WriteSheet sheet2 = EasyExcel.writerSheet(1, "报表2").head(DtsReserve.class).includeColumnFiledNames(includeColumnNames).build();
+        excelWriter.write(list2, sheet2);
+        excelWriter.finish();
     }
 
 
