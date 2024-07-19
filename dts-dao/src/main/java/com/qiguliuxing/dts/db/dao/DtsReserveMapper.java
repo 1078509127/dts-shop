@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface DtsReserveMapper extends BaseMapper<DtsReserve> {
 
-    List<DtsReserve> getByDate(@Param("scene")String scene,@Param("date")String date,@Param("startTime")Date startTime,@Param("endTime")Date endTime);
+    List<DtsReserve> getByDate(@Param("scene")String scene,@Param("date")String date,@Param("startTime")Date startTime,@Param("endTime")Date endTime,@Param("tableNumber")String tableNumber);
 
     List<DtsReserve> getMonDateed(@Param("scene")String scene,@Param("eventType")String eventType,@Param("date")String date, @Param("dateend")String dateend);
 
