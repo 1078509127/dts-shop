@@ -88,7 +88,7 @@ public class WxFeedbackController {
 
 		DtsUser user = userService.findById(userId);
 		String username = user.getUsername();
-		feedback.setId(null);
+		feedback.setId(user.getId());
 		feedback.setUserId(userId);
 		feedback.setUsername(username);
 		// 状态默认是0，1表示状态已发生变化
