@@ -205,7 +205,6 @@ public class WxAuthController {
 			user.setLastLoginTime(LocalDateTime.now());
 			user.setLastLoginIp(IpUtil.client(request));
 			user.setShareUserId(shareUserId);
-
 			userService.add(user);
 
 			// 新用户发送注册优惠券
@@ -235,6 +234,7 @@ public class WxAuthController {
 		result.put("tokenExpire", userToken.getExpireTime().toString());
 		userInfo.setUserId(user.getId());
 		userInfo.setNickName(user.getNickname());//用户名
+		userInfo.setRegister(user.getRegister());// 注册标识0未注册1已注册
 		if (!StringUtils.isEmpty(user.getMobile())) {// 手机号存在则设置
 			userInfo.setPhone(user.getMobile());
 		}
@@ -323,12 +323,6 @@ public class WxAuthController {
 			return ResponseUtil.badArgument();
 		}
 
-//		List<DtsUser> userList = userService.queryByUsername(username);
-//		if (userList.size() > 0) {
-//			logger.error("请求账号注册出错:{}", AUTH_NAME_REGISTERED.desc());
-//			return WxResponseUtil.fail(AUTH_NAME_REGISTERED);
-//		}
-
 		List<DtsUser> userList = userService.queryByMobile(mobile);
 		if (userList.size() > 0) {
 			logger.error("请求账号注册出错:{}", AUTH_MOBILE_REGISTERED.desc());
@@ -342,10 +336,10 @@ public class WxAuthController {
 			return WxResponseUtil.fail(AUTH_MOBILE_REGISTERED);
 		}
 
-		if (!RegexUtil.isMobileExact(mobile)) {
-			logger.error("请求账号注册出错:{}", AUTH_INVALID_MOBILE.desc());
-			return WxResponseUtil.fail(AUTH_INVALID_MOBILE);
-		}
+//		if (!RegexUtil.isMobileExact(mobile)) {
+//			logger.error("请求账号注册出错:{}", AUTH_INVALID_MOBILE.desc());
+//			return WxResponseUtil.fail(AUTH_INVALID_MOBILE);
+//		}
 		// 查询用户ID
 		DtsUser userListByUserid = userService.findById(Integer.parseInt(userid));
 
@@ -362,17 +356,18 @@ public class WxAuthController {
 		user.setId(Integer.parseInt(userid));
 		user.setUsername(username);
 		user.setMobile(mobile);
-		user.setAvatar(CommConsts.DEFAULT_AVATAR);
+		//user.setAvatar(CommConsts.DEFAULT_AVATAR);
 		user.setNickname(username);
 		user.setGender((byte) 0);
 		user.setUserLevel((byte) 0);
 		user.setStatus((byte) 0);
 		user.setLastLoginTime(LocalDateTime.now());
 		user.setLastLoginIp(IpUtil.client(request));
-
+		user.setRegister(1);//注册
+		int reIssucces=0;
 		if (userListByUserid.getId()!=null&& userListByUserid.getId()!=0){
 			// 修改该ID 用户信息
-			userService.updateById(user);
+			reIssucces = userService.updateById(user);
 		}else {
 			// 添加user信息
 			userService.add(user);
@@ -384,10 +379,66 @@ public class WxAuthController {
 		UserInfo userInfo = new UserInfo();
 		userInfo.setNickName(username);
 		userInfo.setAvatarUrl(user.getAvatar());
+		userInfo.setRegister(user.getRegister());
+
 
 
 		Map<Object, Object> result = new HashMap<Object, Object>();
 		result.put("userInfo", userInfo);
+		result.put("reIssucces", reIssucces);
+
+
+		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
+		return ResponseUtil.ok(result);
+	}
+//用户修改
+	@PostMapping("upuser")
+	public Object upUser(@RequestBody String body, HttpServletRequest request) {
+		Map<Object, Object> result = new HashMap<Object, Object>();
+		logger.info("【请求开始】修改信息,请求参数，body:{}", body);
+
+		String username = JacksonUtil.parseString(body, "username");
+		String mobile = JacksonUtil.parseString(body, "mobile");
+		String userid = JacksonUtil.parseString(body, "userid");
+
+		if (StringUtils.isEmpty(username)  || StringUtils.isEmpty(mobile)) {
+			return ResponseUtil.badArgument();
+		}
+
+
+		// 查询用户ID
+		DtsUser userListByUserid = userService.findById(Integer.parseInt(userid));
+		if (userListByUserid.getId() !=null && userListByUserid.getId()!=0){
+
+			DtsUser user = null;
+			user = new DtsUser();
+			user.setId(Integer.parseInt(userid));
+			user.setUsername(username);
+			user.setMobile(mobile);
+			user.setAvatar(userListByUserid.getAvatar());
+			//user.setAvatar(CommConsts.DEFAULT_AVATAR);
+			user.setNickname(username);
+			user.setGender((byte) 0);
+			user.setUserLevel((byte) 0);
+			user.setStatus((byte) 0);
+			user.setLastLoginTime(LocalDateTime.now());
+			user.setLastLoginIp(IpUtil.client(request));
+
+			if (userListByUserid.getId()!=null&& userListByUserid.getId()!=0){
+				// 修改该ID 用户信息
+				userService.updateById(user);
+				UserInfo userInfo = new UserInfo();
+				userInfo.setPhone(mobile);
+				userInfo.setUserId(Integer.parseInt(userid));
+				userInfo.setNickName(username);
+				userInfo.setAvatarUrl(user.getAvatar());
+				result.put("userInfo", userInfo);
+
+			}
+
+		}
+
+
 
 		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
 		return ResponseUtil.ok(result);

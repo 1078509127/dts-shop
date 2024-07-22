@@ -58,6 +58,8 @@ public class SystemManageController {
     private DtsFeedbackService feedbackService;
     @Autowired
     private DtsArticleService articleService;
+    @Autowired
+    private DtsUserService userService;
 
     /**
      * 轮播图上传
@@ -165,18 +167,24 @@ public class SystemManageController {
         //List<DtsFeedback> feedbackList= new ArrayList<>();
         //if (type!=null){
         List<DtsFeedback> feedbackList = feedbackService.all();//userId, username, page, limit, sort, order
-                /*if (type.equals("优化建议")){
-                    feedbackList = feedbackService.type(type);
+        DtsUser user =null;
+        DtsFeedback d =null;
 
-                }else if (type.equals("功能异常")){
+        for (int i=0;i<feedbackList.size();i++){
 
-                    feedbackList = feedbackService.type(type);
+            user = userService.findById(feedbackList.get(i).getUserId());
+            if (user !=null){
 
-                }else {*/
-        //查询全部
-        //feedbackList = feedbackService.all();//userId, username, page, limit, sort, order
-        //}
-        //}
+                feedbackList.get(i).setUsername(user.getUsername());
+
+                //d.setUsername(user.getUsername());
+                //feedbackMapper.updateByPrimaryKey(d);
+            }
+
+
+        }
+
+
 
         logger.info("【请求结束】留言查看,响应结果:{}", JSONObject.toJSONString(feedbackList));
         return Result.success(feedbackList);

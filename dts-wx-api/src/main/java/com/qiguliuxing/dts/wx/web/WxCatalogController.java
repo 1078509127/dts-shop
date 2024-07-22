@@ -24,7 +24,7 @@ import com.qiguliuxing.dts.wx.service.HomeCacheManager;
  * 类目服务
  */
 @RestController
-@RequestMapping("/wx/catalog")
+	@RequestMapping("/wx/catalog")
 @Validated
 public class WxCatalogController {
 	private static final Logger logger = LoggerFactory.getLogger(WxCatalogController.class);
@@ -139,6 +139,16 @@ public class WxCatalogController {
 		data.put("currentSubCategory", currentSubCategory);
 
 		logger.info("【请求结束】当前分类栏目查询,响应结果:{}", JSONObject.toJSONString(data));
+		return ResponseUtil.ok(data);
+	}
+	//查询所有场馆信息
+	@GetMapping("categurInfo")
+	public Object categurInfo() {
+		List<DtsCategory> currentCategory = categoryService.selectAll();
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("currentCategory", currentCategory);
+		//data.put("currentCategory", currentCategory);
+
 		return ResponseUtil.ok(data);
 	}
 }

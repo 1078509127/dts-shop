@@ -27,6 +27,15 @@ public class UserInfo implements Serializable {
 	private Byte status;//状态
 	private String registerDate;//注册日期
 	private String roleIds;//角色权限
+	private Integer register; //注册flag
+
+	public void setRegister(Integer register) {
+		this.register = register;
+	}
+
+	public Integer getRegister() {
+		return register;
+	}
 
 	public String getCountry() {
 		return country;

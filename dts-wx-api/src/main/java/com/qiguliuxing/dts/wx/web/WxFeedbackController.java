@@ -19,6 +19,10 @@ import com.qiguliuxing.dts.db.service.DtsFeedbackService;
 import com.qiguliuxing.dts.db.service.DtsUserService;
 import com.qiguliuxing.dts.wx.annotation.LoginUser;
 
+import java.util.List;
+
+import static org.apache.shiro.web.filter.mgt.DefaultFilter.user;
+
 /**
  * 意见反馈服务
  *
@@ -96,6 +100,30 @@ public class WxFeedbackController {
 		feedbackService.add(feedback);
 
 		logger.info("【请求结束】添加意见反馈,响应结果:{}", JSONObject.toJSONString(feedback));
+		return ResponseUtil.ok();
+	}
+
+
+	//查询留言用户
+	@PostMapping("selFeedbackUser")
+	public Object selFeedbackUser(int [] userId) {
+		//logger.info("【请求开始】添加意见反馈,请求参数,userId:{},size:{}", userId, JSONObject.toJSONString(feedback));
+
+		List<DtsFeedback> feedback ;
+		for (int i=0;i<userId.length;i++){
+			DtsUser user = userService.findById(userId[i]);
+		}
+
+
+//		String username = user.getUsername();
+//		feedback.setId(null);
+//		feedback.setUserId(userId);
+//		feedback.setUsername(username);
+//		// 状态默认是0，1表示状态已发生变化
+//		feedback.setStatus(1);
+//		feedbackService.add(feedback);
+
+		logger.info("【请求结束】添加意见反馈,响应结果:{}", JSONObject.toJSONString(user));
 		return ResponseUtil.ok();
 	}
 
