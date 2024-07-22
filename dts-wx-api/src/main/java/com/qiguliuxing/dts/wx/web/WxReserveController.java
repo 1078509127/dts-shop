@@ -54,6 +54,7 @@ public class WxReserveController {
         dtsReserve.setStartTime(sdf.parse(start));
         dtsReserve.setEndTime(sdf.parse(end));
         dtsReserve.setIsReserve(0);
+        dtsReserve.setCreateTime(new Date());
         BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         Result<String> full = this.teamisFull(dtsReserveVo.getScene(), dtsReserveVo.getDate(),dtsReserveVo.getEventType() );
         if (full.getCode() == 500){

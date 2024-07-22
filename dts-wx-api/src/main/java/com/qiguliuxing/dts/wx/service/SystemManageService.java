@@ -28,6 +28,7 @@ public class SystemManageService {
 
     public List<DtsReserve> getData(String date,List<String> list){
         LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DtsReserve::getIsReserve,0);
         queryWrapper.in(DtsReserve::getScene,list);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

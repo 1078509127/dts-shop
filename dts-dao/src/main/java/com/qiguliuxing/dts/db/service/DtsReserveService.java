@@ -66,6 +66,7 @@ public class DtsReserveService {
       queryWrapper.eq(DtsReserve::getScene, scene);
       queryWrapper.gt(DtsReserve::getEndTime, startTime);
       queryWrapper.lt(DtsReserve::getStartTime, endTime);
+      queryWrapper.eq(DtsReserve::getIsReserve, 0);
       return dtsReserveMapper.selectList(queryWrapper);
    }
 

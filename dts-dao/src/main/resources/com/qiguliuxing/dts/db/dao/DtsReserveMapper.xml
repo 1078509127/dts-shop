@@ -21,6 +21,7 @@
                     or  (end_time &gt; #{startTime,jdbcType=TIMESTAMP} and end_time &lt; #{endTime,jdbcType=TIMESTAMP})
                 </otherwise>
             </choose>
+        and is_reserve = 0
         </where>
     </select>
 </mapper>
