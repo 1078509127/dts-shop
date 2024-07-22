@@ -69,11 +69,13 @@ public class DtsReserveService {
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
-   public List<DtsReserve> getByWeek(Integer userId,Date monday,Date sunday) {
+   public List<DtsReserve> getByWeek(Integer userId,Date monday,Date sunday,String scene) {
       LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
       queryWrapper.eq(DtsReserve::getUserId,userId);
       queryWrapper.ge(DtsReserve::getStartTime,monday);
       queryWrapper.le(DtsReserve::getEndTime,sunday);
+      queryWrapper.eq(DtsReserve::getIsReserve,0);
+      queryWrapper.eq(DtsReserve::getScene,scene);
       return dtsReserveMapper.selectList(queryWrapper);
    }
 

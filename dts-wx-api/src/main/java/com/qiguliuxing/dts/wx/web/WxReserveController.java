@@ -176,12 +176,10 @@ public class WxReserveController {
      * */
     @PostMapping("delReserve")
     public Object delReserve(@RequestBody DtsReserveVo dtsReserveVo) throws ParseException {
-        String start = new StringBuilder().append(dtsReserveVo.getDate()).append(" ").append(dtsReserveVo.getStartTime()).toString();
-        String end = new StringBuilder().append(dtsReserveVo.getDate()).append(" ").append(dtsReserveVo.getEndTime()).toString();
         SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
         DtsReserve dtsReserve = new DtsReserve();
-        dtsReserve.setStartTime(sdf.parse(start));
-        dtsReserve.setEndTime(sdf.parse(end));
+        dtsReserve.setStartTime(sdf.parse(dtsReserveVo.getStartTime()));
+        dtsReserve.setEndTime(sdf.parse(dtsReserveVo.getEndTime()));
         BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         int update = dtsReserveService.update(dtsReserve);
         if (update>0){
@@ -253,7 +251,7 @@ public class WxReserveController {
         Date dates = sdf.parse(date);
         Date monday = getMondayOfWeek(dates);
         Date sunday = getSundayOfWeek(dates);
-        List<DtsReserve> byWeek = dtsReserveService.getByWeek(userId,monday, sunday);
+        List<DtsReserve> byWeek = dtsReserveService.getByWeek(userId,monday, sunday,scene);
         if (byWeek.size() >= 2){
             return Result.fail(500,"每周至多可预约两次");
         }
