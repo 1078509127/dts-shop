@@ -9,6 +9,9 @@
             <if test="scene != null and scene != ''">
                 and scene = #{scene,jdbcType=INTEGER}
             </if>
+            <if test="tableNumber != null and tableNumber != ''">
+                and table_number = #{tableNumber,jdbcType=VARCHAR}
+            </if>
             <choose>
                 <when test="startTime == null or endTime == null">
                     and DATE_FORMAT(start_time, '%Y-%m-%d') = #{date,jdbcType=VARCHAR}

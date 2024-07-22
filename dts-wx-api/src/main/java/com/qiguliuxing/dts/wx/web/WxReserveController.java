@@ -71,7 +71,7 @@ public class WxReserveController {
 
     @GetMapping("/teamisFull")
     public Result<String> teamisFull(@RequestParam String scene,@RequestParam String date,@RequestParam(required = false) String eventType) throws ParseException {
-        List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null);
+        List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null,null);
         if (byDay.isEmpty()){
             return Result.success("可预约");
         }else {
@@ -135,9 +135,6 @@ public class WxReserveController {
                 if(end.equals(newend)){
                     break;
                 }
-
-
-
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -160,7 +157,7 @@ public class WxReserveController {
         dtsReserve.setIsReserve(0);
         dtsReserve.setCreateTime(new Date());
         BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
-        Result<String> full = this.isFull(dtsReserveVo.getScene(),dtsReserveVo.getUserId(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00");
+        Result<String> full = this.isFull(dtsReserveVo.getScene(),dtsReserveVo.getUserId(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00",dtsReserveVo.getTableNumber());
         if (full.getCode() == 500){
             return Result.fail(500,full.getMessage());
         }
@@ -219,7 +216,9 @@ public class WxReserveController {
     }
 
     @GetMapping("/isFull")
-    public Result<String> isFull(@RequestParam String scene,@RequestParam Integer userId,@RequestParam String date,@RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime) throws ParseException {
+    public Result<String> isFull(@RequestParam String scene,@RequestParam Integer userId,@RequestParam String date,
+                                 @RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime,
+                                 @RequestParam String tableNumber) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date dates = sdf.parse(date);
         Date monday = getMondayOfWeek(dates);
@@ -235,7 +234,7 @@ public class WxReserveController {
         LocalTime closeTime = LocalTime.of(20, 0);//关闭时间
 
         //查询当日是否有预约，无预约直接返回，有预约判断是否约满、预约时间段和库中数据是否有时间重叠
-        List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null);
+        List<DtsReserve> byDay = dtsReserveService.getByDate(scene,date,null,null,tableNumber);
         if (byDay.isEmpty()){
             return Result.success("可预约");
         }

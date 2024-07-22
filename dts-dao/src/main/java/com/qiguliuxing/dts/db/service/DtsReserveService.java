@@ -47,8 +47,8 @@ public class DtsReserveService {
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
-   public List<DtsReserve> getByDate(String scene,String date,Date startTime,Date endTime) {
-      return dtsReserveMapper.getByDate(scene,date,startTime,endTime);
+   public List<DtsReserve> getByDate(String scene,String date,Date startTime,Date endTime,String tableNumber) {
+      return dtsReserveMapper.getByDate(scene,date,startTime,endTime,tableNumber);
    }
 
    public List<DtsReserve> getByStartAndEnd(String scene,Date startTime,Date endTime) {
