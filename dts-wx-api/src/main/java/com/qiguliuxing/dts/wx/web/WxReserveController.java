@@ -10,6 +10,8 @@ import com.qiguliuxing.dts.wx.dao.FreeTimeSolt;
 import com.qiguliuxing.dts.wx.dao.UseTimeSolt;
 import com.qiguliuxing.dts.wx.util.FreeTime;
 import com.qiguliuxing.dts.wx.util.Result;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -211,6 +213,34 @@ public class WxReserveController {
             dtsReserveVo.setEndTime(endStr);
 
             dtsReserveVos.add(dtsReserveVo);
+        });
+        return new Result<>(200,null,dtsReserveVos);
+    }
+
+    /**
+     * 预约回显基本数据
+     * */
+    @GetMapping("/echo")
+    public Object echo(@RequestParam(required = true) String userId,@RequestParam(required = false) String eventType) throws ParseException {
+        List<DtsReserve> dtsReserves = dtsReserveService.echo(userId,eventType);
+        List<DtsReserveVo> dtsReserveVos = new ArrayList<>();
+        dtsReserves.stream().forEach(dtsReserve -> {
+            if (ObjectUtils.isNotEmpty(dtsReserve.getStartTime())){
+                DtsReserveVo dtsReserveVo = new DtsReserveVo();
+                BeanUtils.copyProperties(dtsReserve,dtsReserveVo);
+
+                SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+                String dateStr = date.format(dtsReserve.getStartTime());
+                dtsReserveVo.setDate(dateStr);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                String startStr = sdf.format(dtsReserve.getStartTime());
+                dtsReserveVo.setStartTime(startStr);
+                String endStr = sdf.format(dtsReserve.getEndTime());
+                dtsReserveVo.setEndTime(endStr);
+
+                dtsReserveVos.add(dtsReserveVo);
+            }
         });
         return new Result<>(200,null,dtsReserveVos);
     }

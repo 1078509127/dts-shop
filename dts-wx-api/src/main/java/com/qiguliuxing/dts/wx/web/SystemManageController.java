@@ -105,6 +105,7 @@ public class SystemManageController {
         response.setCharacterEncoding("utf-8");
         // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
         response.setHeader("Content-disposition", "attachment;filename="  + "预约报表.xlsx");
+
         List<String> string1 = Arrays.asList(new String[]{"乒乓球馆", "微机室", "瑜伽室", "书法室", "录音室", "烘培室"});
         List<DtsReserve> list1 = systemManageService.getData(date,string1);
         //去除指定列
@@ -123,6 +124,7 @@ public class SystemManageController {
         includeColumnNames.add("phone");
         includeColumnNames.add("eventType");
         includeColumnNames.add("scene");
+        includeColumnNames.add("createTime");
         includeColumnNames.add("times");
         WriteSheet sheet2 = EasyExcel.writerSheet(1, "报表2").head(DtsReserve.class).includeColumnFiledNames(includeColumnNames).build();
         excelWriter.write(list2, sheet2);

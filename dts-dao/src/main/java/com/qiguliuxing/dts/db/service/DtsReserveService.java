@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.qiguliuxing.dts.db.dao.DtsReserveMapper;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
+import com.qiguliuxing.dts.db.domain.DtsUser;
 import com.qiguliuxing.dts.db.util.DateUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class DtsReserveService {
 
    @Resource
    private DtsReserveMapper dtsReserveMapper;
+   @Resource
+   private DtsUserService dtsUserService;
 
    public int save(DtsReserve dtsReserve) {
       int insert = dtsReserveMapper.insert(dtsReserve);
@@ -44,6 +47,13 @@ public class DtsReserveService {
       queryWrapper.eq(DtsReserve::getEventType,eventType);
       queryWrapper.eq(DtsReserve::getIsReserve,0);
       queryWrapper.ge(DtsReserve::getStartTime, DateUtils.getDate());
+      return dtsReserveMapper.selectList(queryWrapper);
+   }
+
+   public List<DtsReserve> echo(String userId,String eventType) {
+      LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.eq(DtsReserve::getUserId,userId);
+      queryWrapper.eq(DtsReserve::getEventType,eventType);
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
@@ -79,6 +89,8 @@ public class DtsReserveService {
 
    public int addOrUpdate(Integer userId, String scene) {
       int flag= 0;
+      DtsUser user = dtsUserService.findById(userId);
+
       LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
       queryWrapper.eq(DtsReserve::getUserId,userId);
       queryWrapper.eq(DtsReserve::getScene,scene);
@@ -87,6 +99,8 @@ public class DtsReserveService {
          Integer times = dtsReserve.getTimes();
          times += 1;
          dtsReserve.setTimes(times);
+         dtsReserve.setUserName(user.getUsername());
+         dtsReserve.setPhone(user.getMobile());
          flag = dtsReserveMapper.update(dtsReserve, queryWrapper);
       }else {
          DtsReserve reserve = new DtsReserve();
@@ -96,6 +110,8 @@ public class DtsReserveService {
          reserve.setIsReserve(0);
          reserve.setEventType("个人预约");
          reserve.setTimes(1);
+         reserve.setUserName(user.getUsername());
+         reserve.setPhone(user.getMobile());
          flag = dtsReserveMapper.insert(reserve);
       }
       return flag;
