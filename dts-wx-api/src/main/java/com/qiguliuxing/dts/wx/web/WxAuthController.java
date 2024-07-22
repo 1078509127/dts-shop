@@ -398,7 +398,7 @@ public class WxAuthController {
 
 		String username = JacksonUtil.parseString(body, "username");
 		String mobile = JacksonUtil.parseString(body, "mobile");
-		String userid = JacksonUtil.parseString(body, "userid");
+		Integer userid = JacksonUtil.parseInteger(body, "userid");
 
 		if (StringUtils.isEmpty(username)  || StringUtils.isEmpty(mobile)) {
 			return ResponseUtil.badArgument();
@@ -406,12 +406,12 @@ public class WxAuthController {
 
 
 		// 查询用户ID
-		DtsUser userListByUserid = userService.findById(Integer.parseInt(userid));
+		DtsUser userListByUserid = userService.findById(userid);
 		if (userListByUserid.getId() !=null && userListByUserid.getId()!=0){
 
 			DtsUser user = null;
 			user = new DtsUser();
-			user.setId(Integer.parseInt(userid));
+			user.setId(userid);
 			user.setUsername(username);
 			user.setMobile(mobile);
 			user.setAvatar(userListByUserid.getAvatar());
@@ -428,7 +428,7 @@ public class WxAuthController {
 				userService.updateById(user);
 				UserInfo userInfo = new UserInfo();
 				userInfo.setPhone(mobile);
-				userInfo.setUserId(Integer.parseInt(userid));
+				userInfo.setUserId(userid);
 				userInfo.setNickName(username);
 				userInfo.setAvatarUrl(user.getAvatar());
 				result.put("userInfo", userInfo);
