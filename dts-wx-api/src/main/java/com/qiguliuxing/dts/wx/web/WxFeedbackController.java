@@ -104,7 +104,7 @@ public class WxFeedbackController {
 	}
 
 
-	//查询留言用户
+	//查询留言用户废除
 	@PostMapping("selFeedbackUser")
 	public Object selFeedbackUser(int [] userId) {
 		//logger.info("【请求开始】添加意见反馈,请求参数,userId:{},size:{}", userId, JSONObject.toJSONString(feedback));
@@ -115,13 +115,7 @@ public class WxFeedbackController {
 		}
 
 
-//		String username = user.getUsername();
-//		feedback.setId(null);
-//		feedback.setUserId(userId);
-//		feedback.setUsername(username);
-//		// 状态默认是0，1表示状态已发生变化
-//		feedback.setStatus(1);
-//		feedbackService.add(feedback);
+
 
 		logger.info("【请求结束】添加意见反馈,响应结果:{}", JSONObject.toJSONString(user));
 		return ResponseUtil.ok();

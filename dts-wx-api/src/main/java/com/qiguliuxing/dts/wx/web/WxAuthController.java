@@ -317,8 +317,7 @@ public class WxAuthController {
 
 		String username = JacksonUtil.parseString(body, "username");
 		String mobile = JacksonUtil.parseString(body, "mobile");
-		String userid = JacksonUtil.parseString(body, "userid");
-
+		Integer userid = JacksonUtil.parseInteger(body, "userid");
 		if (StringUtils.isEmpty(username)  || StringUtils.isEmpty(mobile)) {
 			return ResponseUtil.badArgument();
 		}
@@ -341,7 +340,7 @@ public class WxAuthController {
 //			return WxResponseUtil.fail(AUTH_INVALID_MOBILE);
 //		}
 		// 查询用户ID
-		DtsUser userListByUserid = userService.findById(Integer.parseInt(userid));
+		DtsUser userListByUserid = userService.findById(userid);
 
 		if (userList.size() == 1) {
 			DtsUser checkUser = userList.get(0);
@@ -353,7 +352,7 @@ public class WxAuthController {
 		DtsUser user = null;
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		user = new DtsUser();
-		user.setId(Integer.parseInt(userid));
+		user.setId(userid);
 		user.setUsername(username);
 		user.setMobile(mobile);
 		//user.setAvatar(CommConsts.DEFAULT_AVATAR);
@@ -440,7 +439,7 @@ public class WxAuthController {
 
 
 
-		logger.info("【请求结束】账号注册,响应结果:{}", JSONObject.toJSONString(result));
+		logger.info("【请求结束】修改用户,响应结果:{}", JSONObject.toJSONString(result));
 		return ResponseUtil.ok(result);
 	}
 
