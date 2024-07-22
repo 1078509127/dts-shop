@@ -47,6 +47,13 @@ public class DtsReserveService {
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
+   public List<DtsReserve> echo(String userId,String eventType) {
+      LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
+      queryWrapper.eq(DtsReserve::getUserId,userId);
+      queryWrapper.eq(DtsReserve::getEventType,eventType);
+      return dtsReserveMapper.selectList(queryWrapper);
+   }
+
    public List<DtsReserve> getByDate(String scene,String date,Date startTime,Date endTime,String tableNumber) {
       return dtsReserveMapper.getByDate(scene,date,startTime,endTime,tableNumber);
    }
