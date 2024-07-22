@@ -159,6 +159,6 @@ public interface DtsFeedbackMapper extends BaseMapper<DtsFeedback> {
      * @project https://github.com/itfsw/mybatis-generator-plugin
      */
     int logicalDeleteByPrimaryKey(Integer id);
-    List<DtsFeedback> selectList();
+    List<DtsFeedback> selctaAllDtsFeedback();
     List<DtsFeedback> selecttypeeList(String feedType);
 }

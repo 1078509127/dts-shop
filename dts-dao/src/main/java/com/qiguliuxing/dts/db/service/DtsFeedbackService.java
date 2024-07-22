@@ -50,10 +50,9 @@ public class DtsFeedbackService {
 	}
     // 查看所有留言
 	public List<DtsFeedback> all(){
-		//LambdaQueryWrapper<DtsFeedback> queryWrapper = new LambdaQueryWrapper<>();
+		return  feedbackMapper.selctaAllDtsFeedback();
 
-		//return systemManageMapper.selectList(queryWrapper);
-		return feedbackMapper.selectList();
+		//return feedbackMapper.selectList();
 
 	}
 

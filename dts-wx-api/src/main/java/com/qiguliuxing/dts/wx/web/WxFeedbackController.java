@@ -104,21 +104,6 @@ public class WxFeedbackController {
 	}
 
 
-	//查询留言用户废除
-	@PostMapping("selFeedbackUser")
-	public Object selFeedbackUser(int [] userId) {
-		//logger.info("【请求开始】添加意见反馈,请求参数,userId:{},size:{}", userId, JSONObject.toJSONString(feedback));
 
-		List<DtsFeedback> feedback ;
-		for (int i=0;i<userId.length;i++){
-			DtsUser user = userService.findById(userId[i]);
-		}
-
-
-
-
-		logger.info("【请求结束】添加意见反馈,响应结果:{}", JSONObject.toJSONString(user));
-		return ResponseUtil.ok();
-	}
 
 }

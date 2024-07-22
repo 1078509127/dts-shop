@@ -130,6 +130,8 @@
     -->
     id, user_id, username, mobile, feed_type, content, `status`, has_picture, pic_urls, 
     add_time, update_time, deleted
+    ORDER BY
+    add_time DESC
   </sql>
   <select id="selectByExample" parameterType="com.qiguliuxing.dts.db.domain.DtsFeedbackExample" resultMap="BaseResultMap">
     <!--
@@ -556,4 +558,23 @@
     update dts_feedback set deleted = 1
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selctaAllDtsFeedback" parameterType="com.qiguliuxing.dts.db.domain.DtsFeedbackExample" resultMap="BaseResultMap">
+    SELECT
+    id,
+    user_id,
+    username,
+    mobile,
+    feed_type,
+    content,
+    STATUS,
+    has_picture,
+    pic_urls,
+    add_time,
+    update_time,
+    deleted
+    FROM
+    dts_feedback
+    ORDER BY
+    add_time DESC
+  </select>
 </mapper>
