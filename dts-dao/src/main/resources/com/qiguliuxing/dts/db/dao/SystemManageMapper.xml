@@ -7,7 +7,7 @@
         <where>
             1=1
             <if test="name != null and name != ''">
-                and user_name LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%') or member_card LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%')
+                and (user_name LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%') or member_card LIKE CONCAT('%', #{name,jdbcType=VARCHAR}, '%'))
             </if>
             and DATE_FORMAT(start_time, '%Y-%m-%d') >= DATE_FORMAT(NOW(), '%Y-%m-%d')
             and is_reserve = 0 order by start_time desc
