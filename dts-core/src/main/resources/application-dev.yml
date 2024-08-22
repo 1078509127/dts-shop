@@ -1,13 +1,14 @@
 dts:
   # 开发者应该设置成自己的wx相关信息
   wx:
-    app-id: wx546a4c409ec469cd
-    app-secret: 251d7a20fb32331569879a4c41b66ff0
+    app-id: wxfca6a2518f958a6d
+    app-secret: 7003719a18393da5025532fb6a7d451b
     mch-id: 1538666666
     mch-key: 1538xxxxxx-1538xxxxxx-1538xxxxxx
     notify-url: https://test.dtsshop.com/demo/order/dtsNotify
     access-token: https://api.weixin.qq.com/cgi-bin/token
-    template-id: FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk
+    msg_sec_check: https://api.weixin.qq.com/wxa/msg_sec_check
+    template-id: zTwgHBPnajISzZh8OrD-jrdB7n2uuKJeotCYnoPcAX8
     subscribe-url: https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=
     # 商户证书文件路径
     # 请参考“商户证书”一节 https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=4_3
@@ -101,7 +102,8 @@ dts:
     local:
       storagePath: dts/storage
       # 这个地方应该是wx模块的WxStorageController的fetch方法对应的地址
-      address: http://localhost:8080/storage/
+      #address: http://192.168.2.47:8080/storage/
+      address: https://www.zgwtpxzx.online/storage/
     # 阿里云对象存储配置信息
     aliyun:
       endpoint: oss-cn-guangzhou.aliyuncs.com
@@ -121,7 +123,7 @@ dts:
       accessKey: 111111
       secretKey: xxxxxx
       bucketName: dts
-      
+
 pagehelper:
   helperDialect:  mysql
   reasonable: true
@@ -131,7 +133,7 @@ pagehelper:
 spring:
   datasource:
     druid:
-      url:  jdbc:mysql://localhost:3306/dts-gitee?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&verifyServerCertificate=false&useSSL=false
+      url:  jdbc:mysql://49.232.190.244:3308/dts-gitee?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true&verifyServerCertificate=false&useSSL=false
       driver-class-name:  com.mysql.jdbc.Driver
       username:  root
       password:  root

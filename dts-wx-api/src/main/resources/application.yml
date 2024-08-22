@@ -7,8 +7,9 @@ spring:
     multipart:
       max-file-size: 50Mb
       max-request-size: 80Mb
-      location: /tmp/tomcat_upload
-      
+      location: /data/jar/tomcat_upload
+      #location: D:\upload      #本地测试
+
 server:
   port: @api.wx.port@
   servlet:
