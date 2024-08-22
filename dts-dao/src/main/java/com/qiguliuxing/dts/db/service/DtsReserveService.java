@@ -29,8 +29,7 @@ public class DtsReserveService {
 
    public int update(DtsReserve dtsReserve) {
       LambdaUpdateWrapper<DtsReserve> updateWrapper = new LambdaUpdateWrapper<>();
-      updateWrapper.eq(DtsReserve:: getUserId,dtsReserve.getUserId()).eq(DtsReserve::getScene,dtsReserve.getScene())
-              .eq(DtsReserve::getStartTime,dtsReserve.getStartTime()).eq(DtsReserve::getEndTime,dtsReserve.getEndTime());
+      updateWrapper.eq(DtsReserve:: getId,dtsReserve.getId());
       updateWrapper.set(DtsReserve::getIsReserve,1);
       return dtsReserveMapper.update(dtsReserve, updateWrapper);
    }
@@ -118,5 +117,10 @@ public class DtsReserveService {
          flag = dtsReserveMapper.insert(reserve);
       }
       return flag;
+   }
+
+   public int delete(Integer userId) {
+      int delete = dtsUserService.delete(userId);
+      return delete;
    }
 }

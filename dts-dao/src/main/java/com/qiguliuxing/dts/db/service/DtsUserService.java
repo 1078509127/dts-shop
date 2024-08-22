@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.qiguliuxing.dts.db.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,21 +15,16 @@ import com.qiguliuxing.dts.db.bean.DayStatis;
 import com.qiguliuxing.dts.db.dao.DtsUserAccountMapper;
 import com.qiguliuxing.dts.db.dao.DtsUserMapper;
 import com.qiguliuxing.dts.db.dao.ex.StatMapper;
-import com.qiguliuxing.dts.db.domain.DtsUser;
-import com.qiguliuxing.dts.db.domain.DtsUserAccount;
-import com.qiguliuxing.dts.db.domain.DtsUserAccountExample;
-import com.qiguliuxing.dts.db.domain.DtsUserExample;
-import com.qiguliuxing.dts.db.domain.UserVo;
 
 @Service
 public class DtsUserService {
-	
+
 	@Resource
 	private DtsUserMapper userMapper;
-	
+
 	@Resource
 	private DtsUserAccountMapper userAccountMapper;
-	
+
 	@Resource
 	private StatMapper statMapper;
 
@@ -131,7 +127,7 @@ public class DtsUserService {
 		//获取账户数据
 		DtsUserAccountExample example = new DtsUserAccountExample();
 		example.or().andUserIdEqualTo(userId);
-		
+
 		DtsUserAccount dbAccount = userAccountMapper.selectOneByExample(example);
 		if (dbAccount == null) {
 			throw new RuntimeException("申请账户不存在");
@@ -142,13 +138,13 @@ public class DtsUserService {
 		}
 		dbAccount.setModifyTime(LocalDateTime.now());
 		userAccountMapper.updateByPrimaryKey(dbAccount);
-		
+
 		//更新会员状态和类型
 		DtsUser user = findById(userId);
 		user.setUserLevel((byte) 2);//区域代理用户
 		user.setStatus((byte) 0);//正常状态
 		updateById(user);
-		
+
 	}
 
 	public DtsUserAccount detailApproveByUserId(Integer userId) {
@@ -159,7 +155,7 @@ public class DtsUserService {
 		DtsUserAccount dbAccount = userAccountMapper.selectOneByExample(example);
 		return dbAccount;
 	}
-	
+
 	public List<DtsUser> queryDtsUserListByNickname(String username,String mobile) {
 		DtsUserExample example = new DtsUserExample();
 		DtsUserExample.Criteria criteria = example.createCriteria();
@@ -180,5 +176,12 @@ public class DtsUserService {
 	public List<DtsUser> all(){
 		LambdaQueryWrapper<DtsUser> queryWrapper = new LambdaQueryWrapper<>();
 		return userMapper.selectList(queryWrapper);
+	}
+
+	public int delete(Integer userId){
+		LambdaQueryWrapper<DtsUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(DtsUser::getId,userId);
+		int delete = userMapper.delete(queryWrapper);
+		return delete;
 	}
 }

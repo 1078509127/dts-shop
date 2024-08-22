@@ -194,6 +194,8 @@ public class WxAuthController {
 
 		if (user == null) {
 			user = new DtsUser();
+			//SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator();
+			//user.setId(idGenerator.generateId());
 			user.setUsername(openId);
 			user.setPassword(openId);
 			user.setWeixinOpenid(openId);

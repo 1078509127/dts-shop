@@ -348,4 +348,17 @@ public class WxReserveController {
             return new Result(400,"扫码失败");
         }
     }
+
+    /**
+     * 注销
+     * */
+    @PostMapping("/delete")
+    public Result delete(@RequestParam Integer userId){
+        int i = dtsReserveService.delete(userId);
+        if (i>0){
+            return new Result(200,"注销成功");
+        }else {
+            return new Result(400,"注销失败");
+        }
+    }
 }

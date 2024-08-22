@@ -124,7 +124,7 @@ public class SystemManageController {
         for (DtsUser user : all) {
             SubscriberVo subscriberVo = new SubscriberVo();
             subscriberVo.setTouser(user.getWeixinOpenid());
-            subscriberVo.setTemplate_id("FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
+            subscriberVo.setTemplate_id("zTwgHBPnajISzZh8OrD-jrdB7n2uuKJeotCYnoPcAX8");
             subscriberVo.setPage("pages/appointment/line_up");
             Map<String,TemplateData> map = new HashMap<>();
             map.put("thing2",new TemplateData(theme));

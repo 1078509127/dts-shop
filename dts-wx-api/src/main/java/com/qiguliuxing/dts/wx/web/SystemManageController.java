@@ -22,6 +22,7 @@ import com.qiguliuxing.dts.wx.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
@@ -61,6 +62,10 @@ public class SystemManageController {
     private DtsArticleService articleService;
     @Autowired
     private DtsUserService userService;
+    @Value("${dts.wx.msg_sec_check}")
+    private String msgSecCheck;
+    @Value("${dts.wx.app-id}")
+    private String appId;
 
     /**
      * 轮播图上传
@@ -143,7 +148,7 @@ public class SystemManageController {
         for (DtsUser user : all) {
             SubscriberVo subscriberVo = new SubscriberVo();
             subscriberVo.setTouser(user.getWeixinOpenid());
-            subscriberVo.setTemplate_id("FAapMIqVsN3El4ONaIeHha1B0LHuYkJE4yCzLnCvMvk");
+            subscriberVo.setTemplate_id("zTwgHBPnajISzZh8OrD-jrdB7n2uuKJeotCYnoPcAX8");
             subscriberVo.setPage("pages/appointment/line_up");
             Map<String, TemplateData> map = new HashMap<>();
             map.put("thing2",new TemplateData(theme));
@@ -157,6 +162,54 @@ public class SystemManageController {
         }
         return result;
     }
+
+    /**
+     * 消息内容安全检查
+     * @param content
+     * @return
+     */
+    @GetMapping("/msgSecCheck")
+    public Boolean msgSecCheck(@RequestParam String content){
+        String accessToken = wechatUtil.getAccessToken();
+        JSONObject data = new JSONObject();
+        data.put("openid", appId);
+        data.put("scene", 1);
+        data.put("version",1);
+        data.put("content", content);
+        String result = restTemplate.postForObject(msgSecCheck+"?access_token="+accessToken, data.toString(),String.class);
+        if (result.contains("ok")){
+            return true;
+        }
+        return false;
+    }
+    /**
+     * 检查图像
+     *	<p><a href="https://developers.weixin.qq.com/miniprogram/dev/framework/security.imgSecCheck.html">校验一张图片是否含有违法违规内容</a>
+     * @param file 文件
+     * @return {@link R}<{@link Boolean}>
+     */
+   /* @SneakyThrows(Exception.class)
+    @PostMapping("imgSecCheck")
+    @ApiOperation(value = "微信图片审核", notes = "传入content")
+    public R<Boolean> checkImage(MultipartFile file) {
+        //TODO 校验文件类型
+        File fileTemp = new File(FileUtils.getTempDirectory(), System.currentTimeMillis() + ".tmp");
+        FileUtils.copyInputStreamToFile(file.getInputStream(), fileTemp);
+        String httpUrl = "https://api.weixin.qq.com/wxa/img_sec_check" + "?access_token=" + wxService.getAccessToken();
+        HttpPost httpPost = new HttpPost(httpUrl);
+        HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("media", fileTemp).setMode(HttpMultipartMode.RFC6532).build();
+        httpPost.setEntity(entity);
+        CloseableHttpClient client = DefaultApacheHttpClientBuilder.get().build();
+        CloseableHttpResponse httpResponse = client.execute(httpPost);
+        String responseContent = (String) Utf8ResponseHandler.INSTANCE.handleResponse(httpResponse);
+        JSONObject resp = JSONUtil.parseObj(responseContent);
+        if (resp.getInt("errcode") == 0) {
+            return R.success("安全审查通过");
+        }
+        fileTemp.delete();
+        return R.fail("安全审查未通过");
+    }*/
+
 
     /**
      * 预约通道查询

@@ -31,7 +31,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>com.qiguliuxing</groupId>
             <artifactId>dts-dao</artifactId>
@@ -79,15 +79,16 @@
                     <executable>true</executable>
                     <!--增加jvm参数-->
                     <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+                    <mainClass>com.qiguliuxing.dts.wx.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
-                        <configuration>
-                            <classifier>exec</classifier>
-                        </configuration>
+<!--                        <configuration>-->
+<!--                            <classifier>exec</classifier>-->
+<!--                        </configuration>-->
                     </execution>
                 </executions>
             </plugin>
