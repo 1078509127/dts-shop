@@ -1,8 +1,10 @@
 package com.qiguliuxing.dts.wx.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.qiguliuxing.dts.db.dao.SystemManageExcelMapper;
 import com.qiguliuxing.dts.db.dao.SystemManageMapper;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
+import com.qiguliuxing.dts.wx.dao.DtsRreserveVOVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ public class SystemManageService {
 
     @Autowired
     private SystemManageMapper systemManageMapper;
+    @Autowired
+    private SystemManageExcelMapper systemManageExcelMapper;
 
     public List<DtsReserve> all(){
         LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
@@ -30,6 +34,7 @@ public class SystemManageService {
         LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(DtsReserve::getIsReserve,0);
         queryWrapper.in(DtsReserve::getScene,list);
+        queryWrapper.orderByDesc(DtsReserve::getCreateTime);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         if (date.equals("近三个月")){
@@ -52,4 +57,6 @@ public class SystemManageService {
         }
         return systemManageMapper.selectList(queryWrapper);
     }
+
+
 }

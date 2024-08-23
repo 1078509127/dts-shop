@@ -15,12 +15,14 @@ import com.qiguliuxing.dts.core.validator.Sort;
 import com.qiguliuxing.dts.db.domain.*;
 import com.qiguliuxing.dts.db.service.*;
 import com.qiguliuxing.dts.wx.annotation.RequiresPermissionsDesc;
+import com.qiguliuxing.dts.wx.dao.DtsRreserveVOVO;
 import com.qiguliuxing.dts.wx.dao.SubscriberVo;
 import com.qiguliuxing.dts.wx.dao.TemplateData;
 import com.qiguliuxing.dts.wx.service.SystemManageService;
 import com.qiguliuxing.dts.wx.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -113,26 +116,72 @@ public class SystemManageController {
 
         List<String> string1 = Arrays.asList(new String[]{"乒乓球馆", "微机室", "瑜伽室", "书法室", "录音室", "烘培室"});
         List<DtsReserve> list1 = systemManageService.getData(date,string1);
+
+        List<DtsRreserveVOVO> dtsReserveVo = new ArrayList<>();
+
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdffTmie =new SimpleDateFormat("HH:mm:ss");
+
+        if(list1.size()>0){
+            for (int i=0;i<list1.size();i++){
+                DtsRreserveVOVO dtsReserveVo1 = new DtsRreserveVOVO();
+                BeanUtils.copyProperties(list1.get(i),dtsReserveVo1);
+                String date1 =sdfDate.format(list1.get(i).getCreateTime());
+                String date2 =sdffTmie.format(list1.get(i).getCreateTime());
+                dtsReserveVo1.setReserveDate(date1);//开始日期
+                dtsReserveVo1.setReservetime(date2);//开始时间
+
+                dtsReserveVo.add(dtsReserveVo1);
+
+            }
+        }
+
+
         //去除指定列
         List<String> excludeColumnNames = new ArrayList<>();
-        excludeColumnNames.add("times");
+        //列宽度map
+        Map<Integer, Integer> columnWidthMap = new HashMap<>();
+
+
         ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build();
-        WriteSheet sheet1 = EasyExcel.writerSheet(0, "报表1").head(DtsReserve.class).excludeColumnFiledNames(excludeColumnNames).build();
-        excelWriter.write(list1, sheet1);
+        WriteSheet sheet1 = EasyExcel.writerSheet(0, "报表1").head(DtsRreserveVOVO.class).excludeColumnFiledNames(excludeColumnNames).build();
+        sheet1.setColumnWidthMap(columnWidthMap);
+        excelWriter.write(dtsReserveVo, sheet1);
 
         List<String> string2 = Arrays.asList(new String[]{"健身房", "图书馆"});
         List<DtsReserve> list2 = systemManageService.getData(date,string2);
+        List<DtsRreserveVOVO> dtsReserveVoList = new ArrayList<>();
+
+        if(list2.size()>0){
+            for (int j=0;j<list2.size();j++){
+                DtsRreserveVOVO dtsReserveVo2 = new DtsRreserveVOVO();
+                BeanUtils.copyProperties(list2.get(j),dtsReserveVo2);
+                String date1 =sdfDate.format(list2.get(j).getCreateTime());
+                String date2 =sdffTmie.format(list2.get(j).getCreateTime());
+                dtsReserveVo2.setReserveDate(date1);//开始日期
+                dtsReserveVo2.setReservetime(date2);//开始时间
+
+                dtsReserveVoList.add(dtsReserveVo2);
+
+            }
+        }
         //只包含指定列
         List<String> includeColumnNames  = new ArrayList<>();
         includeColumnNames.add("userId");
         includeColumnNames.add("userName");
         includeColumnNames.add("phone");
-        includeColumnNames.add("eventType");
+//        includeColumnNames.add("eventType"); //个人预约/团队预约
         includeColumnNames.add("scene");
-        includeColumnNames.add("createTime");
+
         includeColumnNames.add("times");
-        WriteSheet sheet2 = EasyExcel.writerSheet(1, "报表2").head(DtsReserve.class).includeColumnFiledNames(includeColumnNames).build();
-        excelWriter.write(list2, sheet2);
+        includeColumnNames.add("reservetime");
+        includeColumnNames.add("reserveDate");
+
+
+        WriteSheet sheet2 = EasyExcel.writerSheet(1, "报表2").head(DtsRreserveVOVO.class).includeColumnFiledNames(includeColumnNames).build();
+
+        sheet2.setColumnWidthMap(columnWidthMap);
+        excelWriter.write(dtsReserveVoList, sheet2);
         excelWriter.finish();
     }
 

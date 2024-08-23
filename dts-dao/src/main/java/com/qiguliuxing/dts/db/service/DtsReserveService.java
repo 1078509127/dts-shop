@@ -3,6 +3,7 @@ package com.qiguliuxing.dts.db.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.qiguliuxing.dts.db.dao.DtsReserveMapper;
 import com.qiguliuxing.dts.db.domain.DtsReserve;
 import com.qiguliuxing.dts.db.domain.DtsUser;
@@ -40,7 +41,18 @@ public class DtsReserveService {
       return dtsReserveMapper.selectList(queryWrapper);
    }
 
-   public List<DtsReserve> getList(String userId,String eventType) {
+   public  int upBydisallowance(DtsReserve dtsReserve){
+      LambdaUpdateWrapper<DtsReserve> wrapperHistory = Wrappers.<DtsReserve>update().lambda()
+              .in(DtsReserve::getId, dtsReserve.getId())
+              .set(DtsReserve::getDisallowance, dtsReserve.getDisallowance());
+
+      // baseMapper写法
+      return dtsReserveMapper.update(null, wrapperHistory);
+   }
+
+
+
+      public List<DtsReserve> getList(String userId,String eventType) {
       LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
       queryWrapper.eq(DtsReserve::getUserId,userId);
       queryWrapper.eq(DtsReserve::getEventType,eventType);

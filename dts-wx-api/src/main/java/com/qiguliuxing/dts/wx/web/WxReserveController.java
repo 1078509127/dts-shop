@@ -190,6 +190,35 @@ public class WxReserveController {
         }
     }
 
+    // 管理员驳回团队 预约
+    @PostMapping("admDisallowance")
+
+    public Object admDisallowance(@RequestBody DtsReserveVo dtsReserveVo) throws ParseException {
+
+        SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
+
+        DtsReserve dtsReserve = new DtsReserve();
+
+//        dtsReserve.setStartTime(sdf.parse(dtsReserveVo.getStartTime()));
+
+//        dtsReserve.setEndTime(sdf.parse(dtsReserveVo.getEndTime()));
+
+        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
+
+        int update = dtsReserveService.upBydisallowance(dtsReserve);
+
+        if (update>0){
+
+            return new Result<>(200,"驳回成功");
+
+        }else {
+
+            return Result.fail("驳回失败");
+
+        }
+
+    }
+
     /**
      * 查询预约
      * */

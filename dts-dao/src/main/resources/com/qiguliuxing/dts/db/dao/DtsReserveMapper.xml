@@ -24,4 +24,17 @@
         and is_reserve = 0
         </where>
     </select>
+
+<!--update 预约信息-->
+    <update id="updisallowance" parameterType="com.qiguliuxing.dts.db.domain.DtsReserve">
+
+        update dts_reserve
+        set
+        <if test="disallowance != null">
+            disallowance = #{disallowance,jdbcType=VARCHAR}
+        </if>
+
+        where id = #{id,jdbcType=INTEGER}
+
+    </update>
 </mapper>
