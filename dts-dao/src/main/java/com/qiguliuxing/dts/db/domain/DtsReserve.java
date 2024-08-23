@@ -91,7 +91,7 @@ public class DtsReserve implements Serializable {
     /**
      *是否取消（0预约/1取消）
      * */
-    @Value("0")
+
     @ExcelIgnore
     private Integer isReserve;
 

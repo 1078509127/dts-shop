@@ -51,11 +51,11 @@ public class WxReserveController {
         String end = new StringBuilder().append(dtsReserveVo.getDate()).append(" 00:00:00").toString();
         SimpleDateFormat sdf =  new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         DtsReserve dtsReserve = new DtsReserve();
+        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         dtsReserve.setStartTime(sdf.parse(start));
         dtsReserve.setEndTime(sdf.parse(end));
         dtsReserve.setIsReserve(0);
         dtsReserve.setCreateTime(new Date());
-        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         Result<String> full = this.teamisFull(dtsReserveVo.getScene(), dtsReserveVo.getDate(),dtsReserveVo.getEventType() );
         if (full.getCode() == 500){
             return Result.fail(500,full.getMessage());
@@ -155,11 +155,11 @@ public class WxReserveController {
         String end = new StringBuilder().append(dtsReserveVo.getDate()).append(" ").append(dtsReserveVo.getEndTime()).toString();
         SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm" );
         DtsReserve dtsReserve = new DtsReserve();
+        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         dtsReserve.setStartTime(sdf.parse(start));
         dtsReserve.setEndTime(sdf.parse(end));
         dtsReserve.setIsReserve(0);
         dtsReserve.setCreateTime(new Date());
-        BeanUtils.copyProperties(dtsReserveVo,dtsReserve);
         Result<String> full = this.isFull(dtsReserveVo.getScene(),dtsReserveVo.getUserId(), dtsReserveVo.getDate(), dtsReserveVo.getStartTime()+":00", dtsReserveVo.getEndTime()+":00",dtsReserveVo.getTableNumber());
         if (full.getCode() == 500){
             return Result.fail(500,full.getMessage());

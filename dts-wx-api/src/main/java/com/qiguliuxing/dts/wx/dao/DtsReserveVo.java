@@ -84,7 +84,7 @@ public class DtsReserveVo implements Serializable {
 //    //日期
 //    private  String ReserveDate;
 @ExcelIgnore
-@TableId(value = "id", type = IdType.AUTO)
+//@TableId(value = "id", type = IdType.AUTO)
 private Integer id;
     /**
      *用户id
@@ -168,7 +168,6 @@ private Integer id;
     /**
      *是否取消（0预约/1取消）
      * */
-    @Value("0")
     @ExcelIgnore
     private Integer isReserve;
 
