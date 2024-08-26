@@ -381,6 +381,7 @@ public class WxAuthController {
 		userInfo.setNickName(username);
 		userInfo.setAvatarUrl(user.getAvatar());
 		userInfo.setRegister(user.getRegister());
+		userInfo.setPhone(mobile);
 
 
 
