@@ -34,6 +34,8 @@ public class SystemManageService {
         LambdaQueryWrapper<DtsReserve> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(DtsReserve::getIsReserve,0);
         queryWrapper.in(DtsReserve::getScene,list);
+        //queryWrapper.ne(DtsReserve::getDisallowance,'1');
+        queryWrapper.isNull(DtsReserve::getDisallowance);//驳回不查询
         queryWrapper.orderByDesc(DtsReserve::getCreateTime);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

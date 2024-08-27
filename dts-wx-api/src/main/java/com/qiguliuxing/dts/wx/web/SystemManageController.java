@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/wx/manage")
@@ -186,6 +189,7 @@ public class SystemManageController {
     }
 
 
+
     /**
      * 活动推送
      * */
@@ -193,23 +197,34 @@ public class SystemManageController {
     public String sendMsg(@RequestParam String theme,@RequestParam String time,@RequestParam String provider,@RequestParam String site,@RequestParam String organ,@RequestParam(required = false) String content){
         String accessToken = wechatUtil.getAccessToken();
         List<DtsUser> all = dtsUserService.all();
-        String result = null;
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        List<CompletableFuture<String>> futures = new ArrayList<>();
         for (DtsUser user : all) {
-            SubscriberVo subscriberVo = new SubscriberVo();
-            subscriberVo.setTouser(user.getWeixinOpenid());
-            subscriberVo.setTemplate_id("zTwgHBPnajISzZh8OrD-jrdB7n2uuKJeotCYnoPcAX8");
-            subscriberVo.setPage("pages/appointment/line_up");
-            Map<String, TemplateData> map = new HashMap<>();
-            map.put("thing2",new TemplateData(theme));
-            map.put("time4",new TemplateData(time));
-            map.put("thing1",new TemplateData(provider));
-            map.put("thing3",new TemplateData(site));
-            map.put("thing7",new TemplateData(organ));
-            subscriberVo.setData(map);
-            result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken,subscriberVo, String.class);
-            System.out.println(result);
+            executor.execute(() -> {
+                // 这里编写线程执行的任务逻辑
+                String msg = wechatUtil.getMsg(user,theme, time, provider, site, organ, accessToken);
+                System.out.println("msg===>"+msg);
+            });
+        /*CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            String msg = wechatUtil.getMsg(user,theme, time, provider, site, organ, accessToken);
+            System.out.println("msg===>"+msg);
+            return msg;
+        }, executor);
+        futures.add(future);*/
         }
-        return result;
+        // 等待所有 CompletableFuture 完成并获取结果
+    /*List<String> results = new ArrayList<>();
+    for (CompletableFuture<String> future : futures) {
+        try {
+            results.add(future.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+        executor.shutdown();
+        //System.out.println("results===>"+results);
+        return "";
     }
 
     /**

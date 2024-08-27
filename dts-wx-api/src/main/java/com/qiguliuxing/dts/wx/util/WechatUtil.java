@@ -2,6 +2,9 @@ package com.qiguliuxing.dts.wx.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.qiguliuxing.dts.db.domain.DtsUser;
+import com.qiguliuxing.dts.wx.dao.SubscriberVo;
+import com.qiguliuxing.dts.wx.dao.TemplateData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -41,4 +44,21 @@ public class WechatUtil {
             return token;
         }
     }
+
+    public  String getMsg(DtsUser user, String theme, String time, String provider, String site, String organ, String accessToken){
+        SubscriberVo subscriberVo = new SubscriberVo();
+        subscriberVo.setTouser(user.getWeixinOpenid());
+        subscriberVo.setTemplate_id("zTwgHBPnajISzZh8OrD-jrdB7n2uuKJeotCYnoPcAX8");
+        subscriberVo.setPage("pages/appointment/line_up");
+        Map<String, TemplateData> map = new HashMap<>();
+        map.put("thing2",new TemplateData(theme));
+        map.put("time4",new TemplateData(time));
+        map.put("thing1",new TemplateData(provider));
+        map.put("thing3",new TemplateData(site));
+        map.put("thing7",new TemplateData(organ));
+        subscriberVo.setData(map);
+        String result = restTemplate.postForObject("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=" + accessToken,subscriberVo, String.class);
+        return result;
+    }
+
 }

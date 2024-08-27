@@ -12,6 +12,9 @@
             <if test="tableNumber != null and tableNumber != ''">
                 and table_number = #{tableNumber,jdbcType=VARCHAR}
             </if>
+<!--            <if test="disallowance != 1">-->
+<!--                and disallowance = #{disallowance,jdbcType=VARCHAR}-->
+<!--            </if>-->
             <choose>
                 <when test="startTime == null or endTime == null">
                     and DATE_FORMAT(start_time, '%Y-%m-%d') = #{date,jdbcType=VARCHAR}
@@ -22,6 +25,7 @@
                 </otherwise>
             </choose>
         and is_reserve = 0
+        AND  ISNULL(disallowance)
         </where>
     </select>
 
