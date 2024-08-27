@@ -115,6 +115,7 @@ public class DtsReserveService {
          dtsReserve.setTimes(times);
          dtsReserve.setUserName(user.getUsername());
          dtsReserve.setPhone(user.getMobile());
+         dtsReserve.setCreateTime(new Date());// 新时间
          flag = dtsReserveMapper.update(dtsReserve, queryWrapper);
       }else {
          DtsReserve reserve = new DtsReserve();
